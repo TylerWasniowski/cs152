@@ -1,0 +1,10 @@
+Your name: Tyler Wasniowski
+Your student ID: 011197745
+Your major: Computer Science
+Your preferred email address: TylerWasniowski@gmail.com
+Check one: [X] Undergraduate, [ ] Graduate, [ ] Open university
+Repeating the class? [ ] Yes, [X] No
+Semester, instructor, and grade of your CS151 prerequisite: Spring 2017, Professor Horstmann, A
+Time it took you to answer the question below:
+Did you ask anyone for help? [ ] Yes, [X] No
+If adding: [ ] Section 3, [ ] Section 4, [ ] Either, [X] N/A
