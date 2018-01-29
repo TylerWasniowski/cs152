@@ -1,0 +1,9 @@
+Tyler Wasniowski
+Enrique Cardenas
+
+1. Done
+2. 43
+3. 43
+4. a + 1
+5. Error, a is immutable
+6. Error, b is an immutable value, so it doesn't make sense to declare the variable before you initialize it.
