@@ -1,9 +1,25 @@
 Tyler Wasniowski
 Enrique Cardenas
 
+Step 1:
 1. Done
 2. 43
 3. 43
 4. a + 1
 5. Error, a is immutable
 6. Error, b is an immutable value, so it doesn't make sense to declare the variable before you initialize it.
+
+Step 2:
+1. triple: Int => Int
+2. 15
+3. Anonymous function Int => Int
+4. Int => Int = <function1>
+5. Int
+
+Step 3:
+1. res0: List[Int] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+2. res1: List[Int] = List(3, 6, 9, 12, 15, 18, 21, 24, 27, 30)
+    the function triple was applied to the whole list, returning a new list.
+3. List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(x => x * x * x)
+
+Step 4:
