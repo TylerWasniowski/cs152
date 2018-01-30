@@ -16,7 +16,7 @@ public class ExprTest2
         assertEquals(-30, (Object) new Product(c(-5), c(6)).value());
     }
 
-    @Test public void postiveProductNegativeArgs() {
+    @Test public void positiveProductNegativeArgs() {
         assertEquals(50, (Object) new Product(c(-5), c(-5), c(-1), c(-2)).value());
     }
 }
