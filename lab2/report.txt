@@ -1,0 +1,38 @@
+Step 1:
+1. List[Int]
+2. List[Any]
+3. Error. Last element isn't Nil.
+4. List("San", "José", "State", "University")
+5. "San" :: "José" :: "State" :: "University"
+
+Step 2:
+1.
+import scala.annotation.tailrec
+
+def concat (list: List[String]): String = {
+  @tailrec def helper (list: List[String], str: String): String = {
+    if (list.isEmpty)
+      str
+    else
+      helper(list.tail, str + list.head)
+  }
+  helper(list, "")
+}
+2. String = SanJoséStateUniversity
+3.
+import scala.annotation.tailrec
+
+def concat (list: List[String]): String = {
+  @tailrec def helper (list: List[String], str: String): String = {
+    if (list.isEmpty)
+      str
+    else {
+      val delimiter = if (list.tail.nonEmpty) " " else ""
+      helper(list.tail, str + list.head + delimiter)
+    }
+  }
+  helper(list, "")
+}
+
+Step 3:
+
