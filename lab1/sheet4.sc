@@ -1,7 +1,8 @@
-def countSevens (n: Int) : Int =
+def countSevens (n: Int): Int =
   if (n == 0)
     0
-  else if (n % 10 == 7)
+  else
+  if (n % 10 == 7)
     countSevens(n/10) + 1
   else
     countSevens(n/10)
@@ -13,4 +14,3 @@ countSevens(777)
 countSevens(52137)
 countSevens(7)
 countSevens(71237)
-
