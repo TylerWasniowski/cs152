@@ -8,8 +8,9 @@ Step 1:
 5. "San" :: "José" :: "State" :: "University"
 
 Step 2:
+1.
 2. String = SanJoséStateUniversity
-
+3.
 
 Step 3:
 1.
@@ -23,6 +24,8 @@ List(3, 1),
 List(3, 2),
 List(3, 3)
 2. Basically do two nested for loops but using tail-recursion instead.
+3.
 
 Step 4:
-
+1.
+2.
