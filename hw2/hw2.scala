@@ -1,7 +1,3 @@
-// Tracing code for interview practice
-// helper("Amy", "") = helper("my", "") + "|" + helper("my", "A")
-// helper("my", "") = helper("y", "") + "|" + helper("y", "m") = "|y|m|my"
-
 object hw2 {
   def subs(s: String) : String = {
     def helper(str: String, ret: String) : String = {
