@@ -1,3 +1,5 @@
+See sheets for code.
+
 Step 1:
 1. List[Int]
 2. List[Any]
@@ -6,33 +8,21 @@ Step 1:
 5. "San" :: "José" :: "State" :: "University"
 
 Step 2:
-1.
-import scala.annotation.tailrec
-
-def concat (list: List[String]): String = {
-  @tailrec def helper (list: List[String], str: String): String = {
-    if (list.isEmpty)
-      str
-    else
-      helper(list.tail, str + list.head)
-  }
-  helper(list, "")
-}
 2. String = SanJoséStateUniversity
-3.
-import scala.annotation.tailrec
 
-def concat (list: List[String]): String = {
-  @tailrec def helper (list: List[String], str: String): String = {
-    if (list.isEmpty)
-      str
-    else {
-      val delimiter = if (list.tail.nonEmpty) " " else ""
-      helper(list.tail, str + list.head + delimiter)
-    }
-  }
-  helper(list, "")
-}
 
 Step 3:
+1.
+List(List(1, 1),
+List(1, 2),
+List(1, 3),
+List(2, 1),
+List(2, 2),
+List(2, 3),
+List(3, 1),
+List(3, 2),
+List(3, 3)
+2. Basically do two nested for loops but using tail-recursion instead.
+
+Step 4:
 
