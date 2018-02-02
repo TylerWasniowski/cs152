@@ -41,6 +41,5 @@ object hw2 {
       0 :: onebits(n / 2).map(m => m + 1)
     else
       onebits(n / 2).map(m => m + 1)
-
   }
 }
