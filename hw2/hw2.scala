@@ -2,12 +2,12 @@ import scala.annotation.tailrec
 
 object hw2 {
   def subs(s: String) : String = {
-    def helper(str: String, ret: String) : String = {
+    def helper(str: String, wordsPrefix: String) : String = {
       if (str.isEmpty)
-        ret
+        wordsPrefix
       else {
-        val notUsingFirstChar = helper(str.substring(1), ret)
-        val usingFirstChar = helper(str.substring(1), ret + str.charAt(0))
+        val notUsingFirstChar = helper(str.substring(1), wordsPrefix)
+        val usingFirstChar = helper(str.substring(1), wordsPrefix + str.charAt(0))
         notUsingFirstChar + "|" + usingFirstChar
       }
     }
