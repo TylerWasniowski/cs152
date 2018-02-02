@@ -1,11 +1,12 @@
 object hw2test extends App {
   println(hw2.subs("Amy"))
   println(hw2.subs("Tyler"))
-  println(hw2.lcs("permission", "cruise missile"))
-  println(hw2.lcs("emissions", "mississippi"))
-  println(hw2.lcs("Yogurt", "Television"))
-  println(hw2.lcs("", ""))
-  println(hw2.lcs("Colon", "Zebra"))
-  println(hw2.lcs("Mary had a little lamb", "Its fleece was white as snow"))
+  println(hw2.lcs("permission", "cruise missile") + "| Expected: \"missi\"")
+  println(hw2.lcs("emissions", "mississippi") + "| Expected: \"missi\"")
+  println(hw2.lcs("Yogurt", "Television") + "| Expected: \"o\"")
+  println(hw2.lcs("", "") + "| Expected: \"\"")
+  println(hw2.lcs("Colon", "Zebra") + "| Expected: \"\"")
+  println(hw2.lcs("Mary had a little lamb", "Its fleece was white as snow") + "| Expected: \"e\"")
+  println(hw2.onebits(13) + "| Expected: List(0, 2, 3)")
   // your other test cases
 }

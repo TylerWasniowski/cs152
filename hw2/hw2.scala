@@ -35,6 +35,12 @@ object hw2 {
   }
 
   def onebits(n: Int) : List[Int] = {
-    Nil
+    if (n == 0)
+      Nil
+    else if (n % 2 == 1)
+      0 :: onebits(n / 2).map(m => m + 1)
+    else
+      onebits(n / 2).map(m => m + 1)
+
   }
 }
