@@ -1,0 +1,28 @@
+The basic idea of recursion is: assume your function already works for some input. Given that it works for that input, how can you use what the function returns for that input to get the answer for a larger input? The only other thing you need to answer is, 'What should the function return for its smallest input?' Then, you can solve the problem by solving a smaller problem and doing a bit of work. To solve the smaller problem, solve an even smaller problem and do a bit of work. Do that until you get to the smallest problem, which is easy for you to solve. The "bit of work" is the answer to the first question.
+
+To paraphrase: the recursive answer to a problem can be determined by answering two questions:
+1. How can you use the solution for a slightly smaller input to get the solution for a slightly larger input?
+2. What is the solution for the smallest possible input?
+
+I will answer those two questions for each of the recursive solutions for the three problems.
+subs:
+    I used an additional input for my solution: what the words returned should be prefixed by. For example, if the input was ('ey', 'H'), the output would be 'H|Hy|He|Hey'.
+    Question 1.
+        My solution to this problem involved 2 recursive cases.
+        Smaller input: the larger input without first character.
+        Case 1:
+            Do not prefix the words returned with the first character.
+        Case 2:
+            Do prefix the words returned with the first character.
+        Since we are assuming the function works, for the input "Amy", the case 1 solution should be: '|y|m|my'. And the case 2 solution should be: 'A|Ay|Am|Amy'.
+        That means the final solution is just the solution to case 1 and case 2 with a pipe between them.
+        We have answered question 1.
+    Question 2.
+        The smallest input is an empty string. The solution should be the given prefix with no pipes.
+        Examples:
+            ('', 'Hi') -> 'Hi'
+            ('', 'elo') -> 'elo'
+    The input is always decreasing, and always approaches the empty string. When the empty string is approached, no addition recursive calls are executed. The solution is correct because of my answers to question 1 and question 2.
+
+
+
