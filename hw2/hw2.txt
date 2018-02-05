@@ -7,7 +7,7 @@ To paraphrase: the recursive answer to a problem can be determined by answering 
 I will answer those two questions for each of the recursive solutions for the three problems.
 subs:
     I used an additional input for my solution: what the words returned should be prefixed by. For example, if the input was ('ey', 'H'), the output would be 'H|Hy|He|Hey'.
-    Question 1.
+    Question 1:
         My solution to this problem involved 2 recursive cases.
         Smaller input: the larger input without first character.
         Case 1:
@@ -17,12 +17,30 @@ subs:
         Since we are assuming the function works, for the input "Amy", the case 1 solution should be: '|y|m|my'. And the case 2 solution should be: 'A|Ay|Am|Amy'.
         That means the final solution is just the solution to case 1 and case 2 with a pipe between them.
         We have answered question 1.
-    Question 2.
+    Question 2:
         The smallest input is an empty string. The solution should be the given prefix with no pipes.
         Examples:
             ('', 'Hi') -> 'Hi'
             ('', 'elo') -> 'elo'
-    The input is always decreasing, and always approaches the empty string. When the empty string is approached, no addition recursive calls are executed. The solution is correct because of my answers to question 1 and question 2.
+    The input is always decreasing, and always approaches the empty string. When the empty string is reached, no additional recursive calls are executed. The solution is correct because of my answers to question 1 and question 2.
 
+lcs:
+    I used a helper function that returns the largest common substring assuming the first letter of the smaller string is part of the common substring. If no common substring exists, it returns the empty string. Although this helper function acts as a loop, it is recursive. If the smaller string is contained in the larger string, it returns the smaller string. If not, it returns the result of the helper function with the same inputs except without the last letter of the smaller string.
+    Question 1:
+        Assume the first character is used in the substring, run the helper function on a and b, save that result.
+        Assume the first character is not used int the substring, run the lcs function with the same inputs except without the first letter of the first string.
+        Return the result of the larger substring between the two.
+        Since we are assuming each function works, for the input ("hello", "jello"), the helper function result would be: "". And not using the first character in the common substring, the function result would be: "ello". The larger substring is "ello", so we would return "ello".
+        We have answered question 1.
+    Question 2:
+        The smallest input is an empty string for the first input. The solution is the empty string.
+    The input is always decreasing, and always approaches the empty string. When the empty string is reached, no additional recursive calls are executed. The solution is correct because of my answers to question 1 and question 2.
 
-
+onebits:
+    Question 1:
+        Call the function with the input bit-shifted 1 unit to the right. For a number like 21, shifting to the right by 1 results in 10. onebits(10) returns List(1, 3).
+        Then, since that is answer for the input shifted 1 to the right, we need to shift all the bits back to the right one unit. We do that by adding 1 to every number in the list. For this example, List(1, 3) would become List(2, 4)
+        Finally, if the number is not divisible by 2, the last bit is a 1, so we prepend a 0 (because the number has a 1 in the 0th bit position.
+    Question 2:
+        The smallest input is 0. The output for onebits(0) should be 0 because 0's binary representation contains no ones.
+    The input is always decreasing, and always approaches 0. When 0 is reached, no additional recursive calls are executed. The solution is correct because of my answers to question 1 and question 2.
