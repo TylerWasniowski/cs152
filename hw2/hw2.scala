@@ -22,14 +22,14 @@ object hw2 {
         helper(shorterString.substring(0, shorterString.length() - 1), longerString)
     }
 
-    val shorterString = if (a.length() < b.length()) a else b
-    val longerString = if (a != shorterString) a else b
-
-    if (shorterString.isEmpty)
-      shorterString
+    if (a.isEmpty)
+      a
     else {
-      val usingFirstChar = helper(shorterString, longerString)
-      val notUsingFirstChar = lcs(shorterString.substring(1), longerString)
+      val usingFirstChar = helper(
+        a.substring(0, if (a.length() < b.length) a.length() else b.length()),
+        b
+      )
+      val notUsingFirstChar = lcs(a.substring(1), b)
       if (usingFirstChar.length() > notUsingFirstChar.length()) usingFirstChar else notUsingFirstChar
     }
   }
@@ -38,8 +38,8 @@ object hw2 {
     if (n == 0)
       Nil
     else if (n % 2 == 1)
-      0 :: onebits(n / 2).map(m => m + 1)
+      0 :: onebits(n >> 1).map(m => m + 1)
     else
-      onebits(n / 2).map(m => m + 1)
+      onebits(n >> 1).map(m => m + 1)
   }
 }
