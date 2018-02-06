@@ -26,5 +26,5 @@ Step 3:
 Step 4:
     1. It is 3.
     2. Parenthesis on the left vs parenthesis on the right.
-    3. Reduce left.
+    3. Reduce right.
     4. See sheet.
