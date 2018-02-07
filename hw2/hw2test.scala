@@ -9,5 +9,6 @@ object hw2test extends App {
   println(hw2.lcs("Colon", "Zebra") + "| Expected: \"\"")
   println(hw2.lcs("Mary had a little lamb", "Its fleece was white as snow") + "| Expected: \"e\"")
   println(hw2.onebits(13) + "| Expected: List(0, 2, 3)")
+  println(hw2.onebits(-5) + "| Expected: List(0, 2, 3)")
   // your other test cases
 }
