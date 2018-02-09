@@ -1,0 +1,14 @@
+See sheet for code
+
+Step 1:
+1. lst.filter(_.length() < 5)
+2. lst.sortBy(_.length())
+3. lst.reduce((a, b) => if (a.length() > b.length) a else b)
+
+Step 2:
+All code.
+
+Step 3:
+1. Code.
+2. Error, can't infer type of parameters for angle brackets.
+3.
