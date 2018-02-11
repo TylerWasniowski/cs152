@@ -1075,4 +1075,43 @@ OnebitsSuite (1 point per passing test case, max. 5, 0 if forbidden constructs):
 hw2.txt (1 point per problem, max. 3): 
 hw2test.scala contains test cases for all problems (max. 1): 
 
-Total Points : 12
+Regraded:
+
+[info] Loading settings from plugins.sbt ...
+[info] Loading global plugins from /home/cay/.sbt/1.0/plugins
+[info] Loading settings from plugins.sbt ...
+[info] Loading project definition from /tmp/cs152/hw2/project
+[info] Loading settings from build.sbt ...
+[info] Set current project to hw2 (in build file:/tmp/cs152/hw2/)
+[info] Compiling 1 Scala source to /tmp/cs152/hw2/target/scala-2.12/classes ...
+[info] Done compiling.
+[info] LcsSuite:
+[info] - lcs of permission and cruise missile
+[info] - Mary had a little lamb...
+[info] - How much wood...
+[info] - How much wood... should not take too long
+[info] - Nothing in common
+[info] OnebitsSuite:
+[info] - Zero has no bits
+[info] - 1023 has 10 bits
+[info] - 1010101010101010101010 has 11 bits
+[info] - -1 has 32 bits *** FAILED ***
+[info]   List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) did not equal List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31) (OnebitsSuite.scala:14)
+[info] - -2 has 31 bits
+[info] AnySuite:
+[info] - Subs of Amy
+[info] - Subs of Mary
+[info] - Subs of Bill
+[info] - Subs of 0123456789
+[info] - Twelve letter string has 4096 subs
+[info] Run completed in 288 milliseconds.
+[info] Total number of tests run: 15
+[info] Suites: completed 3, aborted 0
+[info] Tests: succeeded 14, failed 1, canceled 0, ignored 0, pending 0
+[info] *** 1 TEST FAILED ***
+[error] Failed tests:
+[error] 	OnebitsSuite
+[error] (test:test) sbt.TestsFailedException: Tests unsuccessful
+[error] Total time: 2 s, completed 11 févr. 2018 09:17:27
+
+Total Points : 18
