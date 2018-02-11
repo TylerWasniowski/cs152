@@ -9,3 +9,6 @@ out/
 hs_err_pid*
 
 *_Ignore*
+
+*/project/project
+target

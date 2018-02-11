@@ -1,6 +1,3 @@
-package test.scala
-
-import main.scala.hw3
 import org.scalatest.FunSuite
 
 class MyTestSuite extends FunSuite {

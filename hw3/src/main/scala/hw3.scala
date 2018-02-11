@@ -1,8 +1,4 @@
-package main.scala
-
-import org.scalactic.Bool
-
-import scala.annotation.tailrec;
+import scala.annotation.tailrec
 
 object hw3 {
   def compose(f: (Int => Int), g: (Int => Int))(n: Int): Int = f(g(n))
