@@ -47,6 +47,7 @@ object hw3 {
       x :: iterateUntil(f(x), f, p)
   }
 
+  // Ask about phrasing in class "combining default with first element"??
   def reduceWithDefault(default: Int, list: List[Int], f: ((Int, Int) => Int)): Int = {
     if (list.isEmpty)
       default
@@ -66,6 +67,15 @@ object hw3 {
       default
     else
       op(helper(list.tail, list.head), default)
+  }
+
+  def both(f: (Int => Boolean), g: (Int => Boolean))(n: Int) : Boolean = f(n) && g(n)
+
+  def any(list: List[Int => Boolean])(n: Int) : Boolean = {
+    if (list.isEmpty)
+      false
+    else
+      list.head(n) || any(list.tail)(n)
   }
 
 }
