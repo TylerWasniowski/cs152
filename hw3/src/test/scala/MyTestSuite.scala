@@ -30,6 +30,10 @@ class MyTestSuite extends FunSuite {
     assert(hw3.iterateUntil(2, x => (x + 2 / x) / 2, (x, y) => math.abs(x - y) < 1E-8) == List(2.0, 1.5, 1.4166666666666665, 1.4142156862745097, 1.4142135623746899))
   }
 
+  test("Reducing difference") {
+    assert(hw3.reduceWithDefault(-1, (1 to 3).toList, _ - _) == (((-1-1)-2)-3))
+  }
+
   test("Reducing sum with default 0") {
     assert(hw3.reduceWithDefault(0, (1 to 100).toList, _ + _) == 5050)
   }

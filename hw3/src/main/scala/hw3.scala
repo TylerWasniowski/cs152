@@ -45,29 +45,25 @@ object hw3 {
 
   // Ask about phrasing in class "combining default with first element"??
   def reduceWithDefault(default: Int, list: List[Int], f: ((Int, Int) => Int)): Int = {
-    if (list.isEmpty)
-      default
-    else
-      f(default, reduceWithDefault(list.head, list.tail, f))
-  }
-
-  def otherReduceWithDefault(default: Int, list: List[Int], op: (Int, Int) => Int): Int = {
     @tailrec def helper(list: List[Int], partialResult: Int): Int = {
       if (list.isEmpty)
         partialResult
       else
-        helper(list.tail, op(list.head, partialResult))
+        helper(list.tail, f(partialResult, list.head))
     }
+    helper(list, default)
+  }
 
+  def otherReduceWithDefault(default: Int, list: List[Int], f: (Int, Int) => Int): Int = {
     if (list.isEmpty)
       default
     else
-      op(helper(list.tail, list.head), default)
+      f(list.head, otherReduceWithDefault(default, list.tail, f))
   }
 
   def both(f: (Int => Boolean), g: (Int => Boolean))(n: Int) : Boolean = f(n) && g(n)
 
-  def any(list: List[Int => Boolean])(n: Int) : Boolean = {
+  @tailrec def any(list: List[Int => Boolean])(n: Int) : Boolean = {
     if (list.isEmpty)
       false
     else
