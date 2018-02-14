@@ -1,0 +1,11 @@
+Step 1:
+    1.
+        See sheet for examples
+        Take: returns a copy of the list of the first n els.
+        Drop: returns a copy of the list not containing the first n els.
+    2. l.take(n) = l.dropRight(len - n)
+    3. See sheet, as soon as predicate returns false, all elements after go into the second list.
+    4. _1 and _2.
+
+Step 2:
+
