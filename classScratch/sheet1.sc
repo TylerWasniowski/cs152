@@ -1,24 +1,24 @@
 import scala.annotation.tailrec
 
-def fac(n: Long) : Long = {
-  @tailrec def helper(n: Long, partialResult: Long) : Long = {
-    if (n <= 0)
-      partialResult
-    else
-      helper(n - 1, n * partialResult)
-  }
+//def fac(n: BigInt) : BigInt = {
+//  @tailrec def helper(n: BigInt, partialResult: BigInt) : BigInt = {
+//    if (n <= BigInt(0))
+//      partialResult
+//    else
+//      helper(n - BigInt(1), n * partialResult)
+//  }
+//
+//  helper(n, BigInt(1))
+//}
+//
+//fac(BigInt(10))
+//fac(BigInt(6))
+//fac(BigInt(3))
+//fac(BigInt(13))
 
-  helper(n, 1)
-}
+def fac2(n: BigInt) : Boolean = n < 5
 
-fac(10)
-fac(6)
-fac(3)
-fac(13)
-
-def fac2(n: Long) : Long = if (n <= 0) 1 else n * fac(n-1)
-
-fac2(10)
-fac2(6)
-fac2(3)
-fac2(13)
+fac2(BigInt(10))
+fac2(BigInt(6))
+fac2(BigInt(3))
+fac2(BigInt(13))
