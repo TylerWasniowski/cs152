@@ -1,9 +1,24 @@
-def fun(n : Int) = (x: Int) => n * x
-def hi = fun(5)
-hi(4)
-hi(4)
-fun(3)(2)
+import scala.annotation.tailrec
 
-List(1, 2, 3).map(_ * 5)
-List(3, 1, 2).sortWith(_ < _)
+//def fac(n: BigInt) : BigInt = {
+//  @tailrec def helper(n: BigInt, partialResult: BigInt) : BigInt = {
+//    if (n <= BigInt(0))
+//      partialResult
+//    else
+//      helper(n - BigInt(1), n * partialResult)
+//  }
+//
+//  helper(n, BigInt(1))
+//}
+//
+//fac(BigInt(10))
+//fac(BigInt(6))
+//fac(BigInt(3))
+//fac(BigInt(13))
 
+def fac2(n: BigInt) : Boolean = n < 5
+
+fac2(BigInt(10))
+fac2(BigInt(6))
+fac2(BigInt(3))
+fac2(BigInt(13))

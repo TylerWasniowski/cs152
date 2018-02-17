@@ -12,7 +12,6 @@ object hw3 {
       list1
     else
       f(list1.head, list2.head) :: zip(list1.tail, list2.tail, f)
-
   }
 
   def combineNeighbors(list: List[Int], f: (Int, Int) => Int): List[Int] = {
