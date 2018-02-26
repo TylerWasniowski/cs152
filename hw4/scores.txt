@@ -1,0 +1,44 @@
+[info] Loading settings from plugins.sbt ...
+[info] Loading project definition from /tmp/hw4/project
+[info] Updating ProjectRef(uri("file:/tmp/hw4/project/"), "hw4-build")...
+[info] Done updating.
+[info] Compiling 1 Scala source to /tmp/hw4/project/target/scala-2.12/sbt-1.0/classes ...
+[info] Done compiling.
+[info] Loading settings from build.sbt ...
+[info] Set current project to hw4 (in build file:/tmp/hw4/)
+[info] Updating ...
+[info] Done updating.
+[info] Compiling 1 Scala source to /tmp/hw4/target/scala-2.12/classes ...
+[info] Done compiling.
+[info] Compiling 2 Scala sources to /tmp/hw4/target/scala-2.12/test-classes ...
+[info] Done compiling.
+[info] LexerSuite:
+[info] - Everything matched
+[info] - Everything ignored
+[info] - Everything reported
+[info] - A match failed
+[info] - C style comments
+[info] - Nested C style comments
+[info] PhoneSuite:
+[info] - cats
+[info] - cats again
+[info] - catsSpaces
+[info] - wordsForDigits
+[info] - wordsForDigits after filtering
+[info] - wordsForDigits again
+[info] - wordsForDigitsSequence
+[info] - wordsForDigitsSequence again
+[info] - grow
+[info] - grow again
+[info] - substrings
+[info] - phoneMnemonics
+[info] - HELLO WORLD
+[info] - KNOW WHEN TO FOLD
+[info] Run completed in 10 seconds, 124 milliseconds.
+[info] Total number of tests run: 20
+[info] Suites: completed 2, aborted 0
+[info] Tests: succeeded 20, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 18 s, completed Feb 23, 2018 11:17:54 PM
+
+Total Points : 20
