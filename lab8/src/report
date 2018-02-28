@@ -1,0 +1,33 @@
+Step 1:
+    1.
+        See .scala
+    2.
+        ((3~None)~Some((-~((4~Some((*~(5~None))))~None))))
+    3.
+        The output changes to: "((3~Some((*~(4~None))))~Some((-~((5~None)~None))))"
+        The 3 is now paired with the 4.
+        4. Multiplication is deeper nested. Than the minus sign in both scenarios.
+    5.
+        Input: (3+1)*2
+        Output: (((((~((3~None)~Some((+~((1~None)~None)))))~))~Some((*~(2~None))))~None)
+    6.
+        Input: &
+        Output:
+            failure: `(' expected but `&' found
+
+                &
+                ^
+
+Step 2:
+    1.
+        See .scala
+    2.
+        -17 and 7
+    3.
+        Evaluates the expression
+    4.
+        Input: (3+1)*2
+        Output:
+            Result: [1.8] parsed: (((((~((3~None)~Some((+~((1~None)~None)))))~))~Some((*~(2~None))))~None)
+            Evaled result: 8
+        scala.MatchError: (((~((3~None)~Some((+~((1~None)~None)))))~)) (of class scala.util.parsing.combinator.Parsers$$tilde)

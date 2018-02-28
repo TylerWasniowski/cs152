@@ -6,7 +6,7 @@ object Main extends App {
                       f: (Int, Int) => Int) extends Expr
 
   case class Definition(name : String, expr : Expr)
-  
+
   def eval(expr : Expr, symbols : Map[String, Int]) : Int =
     expr match {
       case Number(num) => num
