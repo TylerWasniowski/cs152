@@ -22,9 +22,8 @@ def tokens(input: String, patterns: List[Regex]) : List[String] = {
   val first = firstMatch(input, patterns)
   if (first.isEmpty)
     Nil
-  else {
+  else
     first :: tokens(input.substring(first.length), patterns)
-  }
 }
 
 tokens(input, patterns).filterNot(_.trim().isEmpty())

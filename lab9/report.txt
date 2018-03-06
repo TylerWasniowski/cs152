@@ -1,0 +1,13 @@
+Step 1:
+1. See .scala
+2. 23
+3. Return and then CTRL+D
+4. We didn't build a tree, we just recursively computed the result.
+
+Step 2:
+1. See .scala
+2. A tree: Operator(Number(3),Operator(Number(4),Number(5), _ * _), _ + _)
+3. A tree: Operator(Number(3),Operator(Number(4),Number(5), _ - _), _ - _)
+4. Stack overflow
+
+

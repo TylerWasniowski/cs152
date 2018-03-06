@@ -11,7 +11,7 @@ class SimpleLanguageParser extends JavaTokenParsers {
     case a ~ Some("/" ~ b) => eval(a) / eval(b)
     case a ~ None => eval(a)
     case a : String => Integer.parseInt(a)
-//    case "(" ~ a ~ ")" => eval(a)
+    case "(" ~ a ~ ")" => eval(a)
   }
 }
 
