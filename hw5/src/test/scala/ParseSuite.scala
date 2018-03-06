@@ -10,4 +10,8 @@ class ParseSuite extends  FunSuite {
   test("One variable") {
     assert(parser.eval(parser.parse(parser.expr, "4 * x + 2").get, Map("x" -> 10)) == 42)
   }
+
+  test("Two variables") {
+    assert(parser.eval(parser.parse(parser.expr, "4 * x + y").get, Map("x" -> 10, "y" -> 2)) == 42)
+  }
 }
