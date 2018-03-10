@@ -1,8 +1,7 @@
 import java.io._
 import scala.util.parsing.combinator._
 
-object hw6part1 {
-
+object hw6part1 extends App {
   class Expr
 
   case class Number(value: Int) extends Expr
@@ -37,10 +36,10 @@ object hw6part1 {
       }
     }
 
-    def term: Parser[Expr] = (factor ~ rep(("*" | "/") ~ term)) ^^ {
+    def term: Parser[Expr] = (factor ~ rep(("*" | "/") ~ factor)) ^^ {
       case a ~ lst => (a /: lst) {
-        case (x, "+" ~ y) => Operator(x, y, _ + _)
-        case (x, "-" ~ y) => Operator(x, y, _ - _)
+        case (x, "*" ~ y) => Operator(x, y, _ * _)
+        case (x, "/" ~ y) => Operator(x, y, _ / _)
       }
     }
 
