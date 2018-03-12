@@ -1,0 +1,4 @@
+val x = 10;
+val y = 25;
+val z = -8;
+x + 7 + y
