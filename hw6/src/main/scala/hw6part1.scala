@@ -49,7 +49,7 @@ object hw6part1 extends App {
 
   val parser = new SimpleLanguageParser
   parser.parseAll(parser.prog, new InputStreamReader(System.in)) match {
-    case parser.Success(result, next) => println(result.eval)
+    case parser.Success(result: Prog, next) => println(result.eval)
     case _ => println("Error")
   }
 }
