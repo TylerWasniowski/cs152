@@ -1,4 +1,5 @@
 import org.scalatest.FunSuite
+import hw5part3._
 
 class ParseSuite extends  FunSuite {
   val parser = new SimpleLanguageParser
