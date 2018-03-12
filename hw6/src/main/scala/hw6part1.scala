@@ -7,7 +7,7 @@ object hw6part1 extends App {
   case class Number(value: Int) extends Expr
   case class Variable(name: String) extends Expr
   case class Operator(left: Expr, right: Expr, f: (Int, Int) => Int) extends Expr
-  case class Def(name: String, value: Expr) extends Expr
+  case class Def(name: String, value: Expr)
 
   case class Prog(defs: List[Def], expr: Expr) {
     def eval: Int = {
@@ -15,7 +15,6 @@ object hw6part1 extends App {
         case Number(n) => n
         case Variable(name) => eval(defs, defs.find(_.name == name).get.value)
         case Operator(left, right, f) => f(eval(defs, left), eval(defs, right))
-        case definition: Def => eval(definition :: defs, expr)
       }
     }
 
