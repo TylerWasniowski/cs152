@@ -16,10 +16,13 @@ case class Operator(left : Expr, right : Expr,
 case class Function(params : List[String], body : Block) extends Expr
 case class IfExpr(cond : Expr, thenBlock : Block, elseBlock : Block) extends Expr
 case class Funcall(fun : Expr, args : List[Expr]) extends Expr
+case class Cons(a: Expr, b: Expr) extends Expr
 
 case class Closure(params : List[String], body : Block, var env : List[(String, Any)]) {
   override def toString = "Closure(" + params + "," + body + ")"  
 }
+
+case class ListOp(f: List[Any] => Any)
 
 class SL1Parser extends JavaTokenParsers {    
   def block: Parser[Block] = rep(valdef | defdef) ~ expr ^^ { case lst ~ e => Block(lst, e) }
@@ -34,6 +37,10 @@ class SL1Parser extends JavaTokenParsers {
         case (x, "-" ~ y) => Operator(x, y, _ - _)
       }
     }
+
+  def cons: Parser[Expr] = rep1(expr <~ "::") ~ "Nil" ^^ {
+    case list ~ nil => (list :+ Variable(nil)).reduce(Cons)
+  }
   
   def term: Parser[Expr] = (factor ~ rep(("*" | "/" ) ~ factor)) ^^ { 
       case a ~ lst => (a /: lst) {
@@ -102,7 +109,9 @@ object SL1 extends App {
     }    
     
     case Function(params, body) => Closure(params, body, symbols)
-    
+
+    case Cons(a, b) => eval(a, symbols) :: eval(b, symbols).asInstanceOf[List[Any]]
+
     case _ => expr
   }
 
@@ -124,7 +133,12 @@ object SL1 extends App {
   val parser = new SL1Parser
   val parseResult = parser.parseAll(parser.block, new InputStreamReader(System.in))
   parseResult match {
-    case parser.Success(result, next) => println(evalBlock(result, List()))
+    case parser.Success(result: Block, next) => println(evalBlock(result, List(
+      ("\"Nil\"", Nil),
+      ("head", ListOp(_.head)),
+      ("tail", ListOp(_.tail)),
+      ("isEmpty", ListOp(list => if (list.isEmpty) 1 else 0))
+    )))
     case _ => println(parseResult)
   }
 }

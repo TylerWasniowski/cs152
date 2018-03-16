@@ -42,9 +42,15 @@ object hw6part1 extends App {
       }
     }
 
+
+    def list: Parser[List] = rep(expr <~ "::") ~ "Nil" ^^ {
+
+    }
+
     def factor: Parser[Expr] = ident ^^ (x => Variable(x)) | wholeNumber ^^ (x => Number(x.toInt)) | "(" ~> expr <~ ")"
 
     def valdef: Parser[Def] = ("val" ~> ident <~ "=") ~ expr <~ ";" ^^ { case s ~ e => Def(s, e) }
+
   }
 
   val parser = new SimpleLanguageParser
