@@ -4,6 +4,8 @@ def reduce(lst: List[Int], op: (Int, Int) => Int): Int =
 
 reduce(List(1,2,3,4,5), (x, y) => x - y)
 
+(6 :: Nil) :+ 5
+(1 to 5).reduce(_ - _)
 (1 to 5).reduceLeft(_ - _)
 (1 to 5).reduceRight(_ - _)
 

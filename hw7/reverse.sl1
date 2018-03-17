@@ -1,0 +1,9 @@
+def appendToNumber = { n, m => n * 10 + m };
+def findFirstDigit = { n => if (n/10) findFirstDigit(n/10) else n };
+def countDigitsRecurse = { n, m => if (n) countDigitsRecurse(n/10, m + 1) else m };
+def countDigits = { n => countDigitsRecurse(n, 0) };
+def pow10 = { n => if (n) 10 * pow10(n - 1) else 1 };
+def lastDigits = { n => if (n/10) n - (findFirstDigit(n) * pow10(countDigits(n) - 1)) else 0 };
+def reverse = { n => if (n) appendToNumber(reverse(lastDigits(n)), findFirstDigit(n)) else 0 };
+
+reverse(1729)

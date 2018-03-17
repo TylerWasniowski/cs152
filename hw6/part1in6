@@ -1,0 +1,4 @@
+val x = 6;
+val y = x + 1;
+val x = 4;
+(x + 2) * y
