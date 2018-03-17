@@ -1,0 +1,14 @@
+1729
+42
+42
+56
+List(1, 2, 3, 4)
+List(1, 2, 3)
+Error
+Error
+Element(greeting,List((type,"hello")),List(Element(text,List((value,"world")),List())))
+Element(text,List((value,"world"), (language,"english"), (charset,"utf-8")),List())
+Element(world,List(),List(Element(hello,List(),List()), Element(goodbye,List(),List())))
+Error
+
+Total Points : 22
