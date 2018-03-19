@@ -24,23 +24,19 @@ case class Closure(params : List[String], body : Block, var env : List[(String, 
 
 case class ListOp(f: List[Any] => Any)
 
-class SL1Parser extends JavaTokenParsers {    
+class SL1Parser extends JavaTokenParsers {
   def block: Parser[Block] = rep(valdef | defdef) ~ expr ^^ { case lst ~ e => Block(lst, e) }
-  
-  def expr: Parser[Expr] = ("if" ~> ("(" ~> expr <~ ")") ~ block <~ "else") ~ block ^^ { 
-    case e ~ b1 ~ b2 => IfExpr(e, b1, b2) 
-  } | expr2    
-   
-  def expr2: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ { 
-      case a ~ lst => (a /: lst) { 
+
+  def expr: Parser[Expr] = ("if" ~> ("(" ~> expr <~ ")") ~ block <~ "else") ~ block ^^ {
+    case e ~ b1 ~ b2 => IfExpr(e, b1, b2)
+  } | cons | expr2
+
+  def expr2: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
+      case a ~ lst => (a /: lst) {
         case (x, "+" ~ y) => Operator(x, y, _ + _)
         case (x, "-" ~ y) => Operator(x, y, _ - _)
       }
     }
-
-  def cons: Parser[Expr] = rep1(expr <~ "::") ~ "Nil" ^^ {
-    case list ~ nil => (list :+ Variable(nil)).reduce(Cons)
-  }
   
   def term: Parser[Expr] = (factor ~ rep(("*" | "/" ) ~ factor)) ^^ { 
       case a ~ lst => (a /: lst) {
@@ -48,11 +44,15 @@ class SL1Parser extends JavaTokenParsers {
         case (x, "/" ~ y) => Operator(x, y, _ / _)
       }
     }
-  
+
+  def cons: Parser[Expr] = (expr2 <~ "::") ~ expr ^^ {
+    case expr ~ (list) => Cons(expr, list)
+  }
+
   def factor: Parser[Expr] = wholeNumber ^^ { x : String => Number(x.toInt) } |
     valOrFuncall
       
-  def valOrFuncall = valOrFun ~ rep( "(" ~> repsep(expr, ",") <~ ")" ) ^^ {
+  def valOrFuncall: Parser[Expr] = valOrFun ~ rep( "(" ~> repsep(expr, ",") <~ ")" ) ^^ {
     case expr ~ argsList => (expr /: argsList)(Funcall)
   }
     
@@ -105,7 +105,8 @@ object SL1 extends App {
     
     case Funcall(fun, args) => eval(fun, symbols) match {
       case Closure(params, body, syms) =>
-        evalBlock(body, params.zip(args.map(eval(_, symbols))) ++ syms) 
+        evalBlock(body, params.zip(args.map(eval(_, symbols))) ++ syms)
+      case ListOp(f) => f(eval(args.head, symbols).asInstanceOf[List[Any]])
     }    
     
     case Function(params, body) => Closure(params, body, symbols)
@@ -134,7 +135,7 @@ object SL1 extends App {
   val parseResult = parser.parseAll(parser.block, new InputStreamReader(System.in))
   parseResult match {
     case parser.Success(result: Block, next) => println(evalBlock(result, List(
-      ("\"Nil\"", Nil),
+      ("Nil", List()),
       ("head", ListOp(_.head)),
       ("tail", ListOp(_.tail)),
       ("isEmpty", ListOp(list => if (list.isEmpty) 1 else 0))

@@ -1,0 +1,5 @@
+def append = { list, n => if (isEmpty(list)) (n :: Nil) else (head(list) :: append(tail(list), n)) };
+def reverse = { list => if (isEmpty(list)) list else append(reverse(tail(list)), head(list)) };
+
+reverse(1 :: 2 :: 3 :: 4 :: 5 :: Nil)
+
