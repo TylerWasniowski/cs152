@@ -27,9 +27,7 @@ case class ListOp(f: List[Any] => Any)
 class SL1Parser extends JavaTokenParsers {
   def block: Parser[Block] = rep(valdef | defdef) ~ expr ^^ { case lst ~ e => Block(lst, e) }
 
-  def expr: Parser[Expr] = ("if" ~> ("(" ~> expr <~ ")") ~ block <~ "else") ~ block ^^ {
-    case e ~ b1 ~ b2 => IfExpr(e, b1, b2)
-  } | cons | expr2
+  def expr: Parser[Expr] = expr3 | cons | expr2
 
   def expr2: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
       case a ~ lst => (a /: lst) {
@@ -37,6 +35,10 @@ class SL1Parser extends JavaTokenParsers {
         case (x, "-" ~ y) => Operator(x, y, _ - _)
       }
     }
+
+  def expr3: Parser[Expr] = ("if" ~> ("(" ~> expr <~ ")") ~ block <~ "else") ~ block ^^ {
+    case e ~ b1 ~ b2 => IfExpr(e, b1, b2)
+  }
   
   def term: Parser[Expr] = (factor ~ rep(("*" | "/" ) ~ factor)) ^^ { 
       case a ~ lst => (a /: lst) {
@@ -45,7 +47,7 @@ class SL1Parser extends JavaTokenParsers {
       }
     }
 
-  def cons: Parser[Expr] = (expr2 <~ "::") ~ expr ^^ {
+  def cons: Parser[Expr] = ((expr3 | expr2) <~ "::") ~ expr ^^ {
     case expr ~ (list) => Cons(expr, list)
   }
 
