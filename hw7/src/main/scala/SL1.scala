@@ -37,17 +37,17 @@ class SL1Parser extends JavaTokenParsers {
         case (x, "-" ~ y) => Operator(x, y, _ - _)
       }
     }
-  
+
+  def cons: Parser[Expr] = (expr2 <~ "::") ~ expr ^^ {
+    case expr ~ (list) => Cons(expr, list)
+  }
+
   def term: Parser[Expr] = (factor ~ rep(("*" | "/" ) ~ factor)) ^^ { 
       case a ~ lst => (a /: lst) {
         case (x, "*" ~ y) => Operator(x, y, _ * _)
         case (x, "/" ~ y) => Operator(x, y, _ / _)
       }
     }
-
-  def cons: Parser[Expr] = (expr2 <~ "::") ~ expr ^^ {
-    case expr ~ (list) => Cons(expr, list)
-  }
 
   def factor: Parser[Expr] = wholeNumber ^^ { x : String => Number(x.toInt) } |
     valOrFuncall

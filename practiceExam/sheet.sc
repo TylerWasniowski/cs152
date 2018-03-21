@@ -21,3 +21,19 @@ def allDifferences(list1: List[Int], list2: List[Int]): List[Int] = {
 }
 
 allDifferences(List(1, 5), List(2, 3, 4)) // List(-1, -2, -3, 3, 2, 1)
+
+def swapFold[T](list: List[T]): List[T] = {
+  val pair = list.foldLeft((Nil, None): (List[T], Option[T]))(
+    (pair, value) => pair._2 match {
+      case Some(otherValue) => (pair._1 :+ value :+ otherValue, None)
+      case None => (pair._1, Some(value))
+    }
+  )
+
+  pair._2 match {
+    case Some(value) => pair._1 :+ value
+    case None => pair._1
+  }
+}
+
+swapFold(List(1))
