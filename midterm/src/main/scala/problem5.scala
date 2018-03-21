@@ -44,7 +44,7 @@ class SL1Parser extends JavaTokenParsers {
     }
   }
 
-  def term2: Parser[Expr] = (factor ~ opt("^" ~ factor)) ^^ {
+  def term2: Parser[Expr] = (factor ~ opt("^" ~ term2)) ^^ {
     case a ~ Some("^" ~ exp) => Operator(a, exp, math.pow(_, _).asInstanceOf[Int])
     case a ~ None => a
   }
