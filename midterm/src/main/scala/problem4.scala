@@ -15,7 +15,7 @@ object problem4 extends App {
      }
      
      def factor: Parser[Int] = wholeNumber ^^ (_.toInt) | "(" ~> expr <~ ")"
-  } 
+  }
    
   val parser = new SimpleLanguageParser
   val result = parser.parseAll(parser.expr, " !true || !false && !!true")
