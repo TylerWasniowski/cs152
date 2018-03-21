@@ -16,19 +16,20 @@ case class Operator(left : Expr, right : Expr,
 case class Function(params : List[String], body : Block) extends Expr
 case class IfExpr(cond : Expr, thenBlock : Block, elseBlock : Block) extends Expr
 case class Funcall(fun : Expr, args : List[Expr]) extends Expr
+case class Cons(a: Expr, b: Expr) extends Expr
 
 case class Closure(params : List[String], body : Block, var env : List[(String, Any)]) {
   override def toString = "Closure(" + params + "," + body + ")"
 }
 
-class SL1Parser extends JavaTokenParsers {
-  def intpow(a: Int, b: Int) = math.pow(a, b).asInstanceOf[Int]
+case class ListOp(f: List[Any] => Any)
 
+class SL1Parser extends JavaTokenParsers {
   def block: Parser[Block] = rep(valdef | defdef) ~ expr ^^ { case lst ~ e => Block(lst, e) }
 
   def expr: Parser[Expr] = ("if" ~> ("(" ~> expr <~ ")") ~ block <~ "else") ~ block ^^ {
     case e ~ b1 ~ b2 => IfExpr(e, b1, b2)
-  } | expr2
+  } | cons | expr2
 
   def expr2: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ {
     case a ~ lst => (a /: lst) {
@@ -37,24 +38,22 @@ class SL1Parser extends JavaTokenParsers {
     }
   }
 
-  def term: Parser[Expr] = (term2 ~ rep(("*" | "/" ) ~ term2)) ^^ {
-    case a ~ lst =>  (a /: lst) {
+  def cons: Parser[Expr] = (expr2 <~ "::") ~ expr ^^ {
+    case expr ~ (list) => Cons(expr, list)
+  }
+
+  def term: Parser[Expr] = (factor ~ rep(("*" | "/" ) ~ factor)) ^^ {
+    case a ~ lst => (a /: lst) {
       case (x, "*" ~ y) => Operator(x, y, _ * _)
       case (x, "/" ~ y) => Operator(x, y, _ / _)
     }
   }
 
-  def term2: Parser[Expr] = (factor ~ opt("^" ~ factor)) ^^ {
-    case a ~ Some("^" ~ exp) => Operator(a, exp, math.pow(_, _).asInstanceOf[Int])
-    case a ~ None => a
-  }
-
   def factor: Parser[Expr] = wholeNumber ^^ { x : String => Number(x.toInt) } |
-    "(" ~> expr <~ ")" | valOrFuncall
+    valOrFuncall
 
-  def valOrFuncall = valOrFun ~ opt( "(" ~> repsep(expr, ",") <~ ")" ) ^^ {
-    case expr ~ Some(args) => Funcall(expr, args)
-    case expr ~ None => expr
+  def valOrFuncall: Parser[Expr] = valOrFun ~ rep( "(" ~> repsep(expr, ",") <~ ")" ) ^^ {
+    case expr ~ argsList => (expr /: argsList)(Funcall)
   }
 
   def valOrFun = "(" ~> expr <~ ")" |
@@ -107,9 +106,12 @@ object SL1 extends App {
       case Funcall(fun, args) => eval(fun, symbols) match {
         case Closure(params, body, syms) =>
           evalBlock(body, params.zip(args.map(eval(_, symbols))) ++ syms)
+        case ListOp(f) => f(eval(args.head, symbols).asInstanceOf[List[Any]])
       }
 
       case Function(params, body) => Closure(params, body, symbols)
+
+      case Cons(a, b) => eval(a, symbols) :: eval(b, symbols).asInstanceOf[List[Any]]
 
       case _ => expr
     }
@@ -130,10 +132,14 @@ object SL1 extends App {
     eval(block.expr, (symbols /: block.defs) { evalDef(_, _) } )
 
   val parser = new SL1Parser
-  val parseResult = parser.parseAll(parser.block, "1 + (-1) * 4 ^ 2 ^ 3")
+  val parseResult = parser.parseAll(parser.block, new InputStreamReader(System.in))
   parseResult match {
-    case parser.Success(result, next) => println(evalBlock(result, List()))
+    case parser.Success(result: Block, next) => println(evalBlock(result, List(
+      ("Nil", List()),
+      ("head", ListOp(_.head)),
+      ("tail", ListOp(_.tail)),
+      ("isEmpty", ListOp(list => if (list.isEmpty) 1 else 0))
+    )))
     case _ => println(parseResult)
   }
 }
-
