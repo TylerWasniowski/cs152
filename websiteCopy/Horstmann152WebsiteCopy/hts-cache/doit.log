@@ -1,0 +1,8 @@
+-qYr3%e1C2%Pns2u1%s%uN0%I0p3DaK0H0%kf2A25000000000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" -Y http://horstmann.com/sjsu/spring2018/cs152/ -O1 "C:\Users\rooke\Projects\cs152\websiteCopy\Horstmann152WebsiteCopy" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar -*[name].youtube.com/*
+File generated automatically on Tue, 20 Mar 2018 20:33:17, do NOT edit
+
+To update a mirror, just launch httrack without any parameters
+The existing cache will be used (and modified)
+To have other options, retype all parameters and launch HTTrack
+To continue an interrupted mirror, just launch httrack without any parameters
+

@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture1/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:12 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 1</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Course Objectives</h1> 
+    <ul>
+      <li>Objectives: 
+        <ul>
+          <li>To ensure that students gain an understanding of programming language design and language translation. </li> 
+          <li>To achieve competence in a functional programming language. </li> 
+        </ul> 
+      </li> 
+      <li>What will you learn? 
+        <ul>
+          <li>How a programming language is compiled or interpreted</li> 
+          <li>How to program in paradigms other than OO</li> 
+        </ul> 
+      </li> 
+      <li>Why should you care? 
+        <ul>
+          <li>For most of your career, you will program in a language other than Java or C...</li> 
+          <li>...and none of us knows today what that language is</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Java.* is not the End of History</h1> 
+    <p class='sideimage'><img width='280' src='../../../fall2008/cs152/francis_fukuyama-the_end_of_history_and_the_last_man.jpg' alt=''/></p> 
+    <ul>
+      <li>1960: Fortran, Algol, Lisp (Dates approximate)</li> 
+      <li>1980: C</li> 
+      <li>1990: C++</li> 
+      <li>1995: Java, JavaScript</li> 
+      <li>Java is showing its age 
+        <ul>
+          <li>Not “agile”</li> 
+          <li>Weak support for concurrency </li> 
+        </ul> 
+      </li>
+      <li>Atwood's law: "Any application that can be written in JavaScript, will eventually be written in JavaScript."</li>
+    </ul> 
+    <p></p> 
+    <p></p> 
+    <h1>The “Cambrian Explosion” of Languages</h1> 
+    <p class='sideimage'><img width='558' src='../../../fall2008/cs152/cambrian.jpg' alt=''/></p> 
+    <ul>
+      <li>Lots of programming languages come and go: 
+        <ul>
+          <li>Ruby, Groovy</li> 
+          <li>Python, PHP, Perl</li>
+          <li>Lisp, Scheme, ML, Haskell</li>
+          <li>Smalltalk</li>
+          <li>C#, F#</li>
+          <li>Matlab, R, Julia</li>
+          <li>Swift, Kotlin</li>
+          <li>Rust</li>
+          <li>Go</li>
+        </ul> 
+      </li> 
+      <li>Some are optimized for different tasks (UI, scientific programming, scripting, ...)</li> 
+      <li>Some aim to be your next general purpose language</li> 
+    </ul> 
+    <h1>What You Will Learn</h1> 
+    <p class='sideimage'><img width='80' src='../../../fall2008/cs152/scala_logo.png' alt=''/></p>
+    <ul><li>A functional subset of Java (instead of Scheme/ML/Haskell)</li>
+      <li>The Scala combinator parser library (instead of JavaCC/Antlr/yacc)</li>
+      <li>JVM code generation</li>
+      <li>Scheme, functional JavaScript</li>
+      <li>Prolog</li>
+      <li>Project: Web development with alternative languages</li>
+    </ul>
+    
+   <h1>What You Need to Succeed</h1> 
+    <p class='sideimage'><img alt='' src='../../../fall2010/cs46a/intro/vermeer-young-woman-seated-at-the-v.jpg'/></p> 
+    <dl>
+      <dt>Prerequisites</dt> 
+      <dd><ul>
+        <li>CS151: Interfaces, inner classes, generic types</li>
+        <li>CS46A/B: Unix shell, basic scripting</li>
+      </ul></dd> 
+      <dt>Time 
+        <dd><ul>
+          <li>You can't expect to learn complex skills just by listening to lectures</li> 
+          <li>Spend 9 hours per week for this class 
+        <ul>
+          <li>2.5 hours in class</li> 
+          <li>6.5 hours (!) outside class for preparation and homework</li> 
+        </ul> 
+            </li></ul></dd></dt>
+      <dt>Laptop</dt>
+      <dd><ul><li>Bring it to each class meeting</li>
+          <li>Install Java 8 and the Scala IDE</li>
+          <li>Be able to run a Bash shell</li>
+        </ul></dd>
+    </dl>
+
+    <h1>Questions</h1>
+<p class='sideimage'><img src='questions.jpg' alt='questions'/></p>
+    
+    <ul>
+      <li>Ask questions <em>right away</em> when you are stuck</li>
+      <li>Use the Piazza online discussion group. </li>
+      <li>You'll get a better grade if you ask lots of questions.</li> 
+      <li>Answer your peers' questions. You'll get a better grade if you do.</li> 
+      <li>Private or confidential questions—email or office hours</li> 
+    </ul> 
+     
+     
+
+    <h1>Plagiarism and Cheating</h1> 
+    <p class='sideimage'><img src='../../../spring2016/cs49j/lecture0/cheating.jpg' alt='cheating'/></p> 
+    <ul>
+      <li>When you submit work, it must be your own personal, individual intellectual creation
+        <ul><li>Not that of your “study group”</li>
+      </ul></li> 
+      <li>Can you copy and paste? 
+        <ul>
+          <li>Always ok to copy</li>
+          <li>Pasting is the problem ☺</li> 
+          <li>Ok to use code from the course materials without attribution</li> 
+          <li>Otherwise, you <strong>must</strong> attribute the source</li> 
+        </ul> 
+      </li> 
+      <li>Don't post/email working code
+        <ul><li>You don't know what the recipient will do with it</li>
+          <li>Sending someone a solution is cheating</li>
+        </ul></li>
+      <li>I periodically run a plagiarism checker
+        <ul><li>If I find cheating, I don't play Sherlock Holmes to find who wrote it—I report both</li>
+      </ul></li>
+    <li>I report <b>everyone</b> whom I find cheating to Student Conduct
+      <ul><li>I have to</li>
+        <li>And I will recommend that an appropriate penalty is for you to fail the course</li>
+    </ul></li>
+    </ul> 
+    <h1>Git</h1>
+    <p class='sideimage'><img src='Octocat.png' alt='Octocat'/></p>
+    <ul><li>You submit all class work via Git</li>
+      <li>Make a <em>private</em> repo on BitBucket or GitHub
+        <ul><li>If you use your SJSU email address, BitBucket gives you a free account with unlimited private repos</li>
+        </ul></li>
+      <li>Add me as a contributor to your repo. My BitBucket and GitHub ids are <code>cayhorstmann</code></li>
+      <li>Use a single repo for <em>all</em> homework and exams</li>
+      <li>Make folders <code>hw1</code>, <code>hw2</code>, <code>lab1</code>, <code>exam1</code>, ...</li>
+      <li>Commit at least once a day for homework/every 10 min in an exam</li>
+      <li>Push before midnight on due date. Grace period until 6am next morning. No mercy afterwards.</li>
+      <li>Never used Git? Check out parts A and D in <a href='http://cs46labs.bitbucket.io/cs46b/lab7/index.html'>this CS46B lab</a>.</li>
+    </ul>
+
+
+    <h1>Adding</h1> 
+    <p class='sideimage'><img alt='' src='../../../fall2012/cs46a/lecture1/adding_large.jpg'/></p> 
+    <ul>
+      <li>Do <a href='../hw1/index.html'>homework 1</a> and send me your answers. </li> 
+      <li>I will send you an add code <strong>when space becomes available</strong>. Use it within 24 hours, or it will become invalid</li> 
+      <li>Show up for all classes/labs even if you haven't received your code</li> 
+  </ul>
+
+
+    <h1>Things To Do Today</h1> 
+    <p class='sideimage'><img alt='' src='today.jpg'/></p> 
+    <ul>
+      <li>Log into Piazza</li> 
+      <li>Install Java 8, Scala, and Git on your laptop</li>
+      <li>If you run Windows and don't know your way around the Windows 10 subsystem for Linux, or if you run MacOS and don't know how to navigate the difference between Linux and BSD, install <a href='../vm.html'>VirtualBox and a Linux VM</a>.</li>
+      <li>Complete Homework 1 and send me your Git repo URL</li>
+      <li><strong>Important:</strong> In lieu of a roll call today, you <em>must</em> turn in homework 1, or I will <em>drop you</em> from this course for lack of presence/prerequisites. </li>
+    </ul>
+
+    <h1>Lab</h1>
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='lab'/></p>
+    <ul><li>Getting going with Piazza</li>
+      <li>Getting going with Git</li>
+      <li>Looking at the homework assignment</li>
+    </ul>
+
+    <h1>Lecture 1 Clicker Question 1</h1>
+    <p>What happens with this code?</p>
+
+    <pre>List&lt;String&gt; strings = new ArrayList&lt;&gt;(Arrays.asList("Harry", "Sally"));
+List&lt;Object&gt; objects = strings;
+objects.set(0, new Integer(42));
+String first = strings.get(0);
+</pre>
+    
+    <ol><li>The code compiles and runs without errors</li>
+      <li>The code throws an exception in line 3</li>
+      <li>The code throws an exception in line 4</li>
+      <li>The code doesn't compile</li>
+    </ol>
+    
+    <h1>Lecture 1 Clicker Question 2</h1>
+    <p>What happens with this code?</p>
+
+    <pre>List&lt;String&gt; strings = new ArrayList&lt;&gt;(Arrays.asList("Harry", "Sally"));
+List objects = strings;
+objects.set(0, new Integer(42));
+String first = strings.get(0);
+</pre>
+    
+    <ol><li>The code compiles and runs without errors</li>
+      <li>The code throws an exception in line 3</li>
+      <li>The code throws an exception in line 4</li>
+      <li>The code doesn't compile</li>
+    </ol>
+    
+    <h1>Lecture 1 Clicker Question 3</h1>
+    <p>What happens with this code?</p>
+
+    <pre>String[] strings = { "Harry", "Sally" };
+Object[] objects = strings;
+objects[0] = new Integer(42);
+String first = strings[0];
+</pre>
+    
+    <ol><li>The code compiles and runs without errors</li>
+      <li>The code throws an exception in line 3</li>
+      <li>The code throws an exception in line 4</li>
+      <li>The code doesn't compile</li>
+    </ol>
+
+    <h1>Installing Git</h1>
+    <ul><li>Make an account on <a href='http://bitbucket.org/'>BitBucket</a>. Use your SJSU email address. </li>
+      <li>Make a repository on BitBucket. Be sure it is a private repo. Call it <code>cs152</code>. Add me (<code>cayhorstmann</code>) as a collaborator with Write access (in Settings → Access Management → Users).</li>
+      <li>Start a Bash shell.</li>
+      <li>Make sure you have <code>git</code>:
+        <pre>git --version
+</pre> It doesn't matter what version you have. If you don't have git, use 
+        <pre>sudo apt-get install git
+</pre></li>
+      <li>Clone the repo:
+        <pre>git clone ssh://git@bitbucket.org/yourname/cs152.git ~/cs152</pre></li>
+    </ul>
+    <h1>Adding to the Repository</h1>
+    <ol><li>In the <code>cs152</code> subdirectory that was created by <code>git clone</code>, make a subdirectory <code>hw1</code></li>
+      <li>In that directory, make a file <code>aboutme.txt</code> as described in Homework 1</li>
+      <li>Open a terminal and change to the directory into which you cloned the repo:
+        <pre>cd cs152
+</pre></li>
+      <li>Type <pre>git add hw1/aboutme.txt</pre></li>
+      <li>Type <pre>git commit -a -m "Started homework 1 "</pre></li>
+      <li>Type <pre>git push origin master</pre></li>
+      <li>In the BitBucket web interface, locate <code>hw1/aboutme.txt</code></li>
+      <li>Did you find it? Hooray—you have just reached level 2.</li>
+    </ol>
+    <h1>A UML Diagram</h1>
+    <ul><li>Get together with two buddies</li>
+      <li>Read through homework 1</li>
+      <li>Grab a marker pen and step up to a whiteboard</li>
+      <li>Draw a UML diagram that shows the relationships between
+        <pre>Expr&lt;Integer&gt;
+Const&lt;Integer&gt;
+Op&lt;Integer&gt;
+Function&lt;Integer&gt;
+Sum
+</pre></li>
+    </ul>
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture1/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+</html>

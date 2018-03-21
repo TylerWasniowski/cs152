@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw6/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+<head>
+    <link href='../../../../styles.css' rel='stylesheet' type='text/css'/> 
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+  </head>
+  <body><h2>Homework 6</h2>
+    <ol><li id='p1'>Finish Lecture 10/Lab 9 Step 3 with values, and add definitions as in Homework 5. Your value definition class should be <code>Def</code> without a type parameter, denoting integer-valued definitions. Here is how to parse a value definition:
+        <pre>    def valdef: Parser[Def] = ("val" ~&gt; ident &lt;~ "=") ~ expr &lt;~ ";" ^^ { case s ~ e =&gt; Def(s, e) } 
+</pre>
+        Parse a program that is a sequence of value definitions followed by a single expression. The <code>prog</code> function of your parser should return an instance of
+        <pre>case class Prog(defs: List[Def], expr: Expr) {
+  def eval: Int
+}
+</pre>The <code>eval</code> function should yield the value of the expression with the given variable bindings.
+        <br/>
+        Put all classes into an object <code>hw6part1</code> whose body is
+        <pre>val parser = new SimpleLanguageParser
+parser.parseAll(parser.prog, new InputStreamReader(System.in)) match {
+  case parser.Success(result, next) =&gt; println(result.eval)
+  case _ =&gt; println("Error")
+}</pre>
+        I will test this program by running
+        <pre>sbt -no-colors "runMain hw6part1" &lt; part1in1
+sbt -no-colors "runMain hw6part2" &lt; part1in2
+...
+</pre>
+        For example, if <code>part1in1</code> contains
+
+        <pre>val x = 12;
+x * x * x + 1</pre>
+        your program should print
+        <pre>1729</pre>
+      </li>
+      <li id='p2'>Write a parser that parses a list of integers (such as <code>(1, 23, -79)</code>) into a Scala list. Also support expressions of the form <code>wholeNumber :: list</code>. 
+        <br/>Put your parser into an object <code>hw6part2</code> in a file <code>src/main/scala/hw6part2.scala</code> whose body is
+        <pre>val parser = new ListParser
+parser.parseAll(parser.list, new InputStreamReader(System.in)) match {
+  case parser.Success(result, next) =&gt; println(result)
+  case _ =&gt; println("Error")
+}</pre>
+        I will test this program by running
+        <pre>sbt -no-colors "runMain hw6part2" &lt; part2in1
+sbt -no-colors "runMain hw6part2" &lt; part2in2
+...
+</pre>
+        For example, if <code>part2in1</code> contains
+
+        <pre>1 :: 2 :: (3, 4)</pre>
+        your program should print
+        <pre>List(1, 2, 3, 4)</pre>
+      </li>
+      
+      <li id='p3'><p>Your task is to come up with a context-free grammar for an XML-like language. Tokens are</p> 
+        <pre>&lt; &gt; = &lt;/ /&gt; ident stringLiteral</pre> 
+        <p>The last two are defined in <code>JavaTokenParsers</code>.</p> 
+        <p>An XML element must be closed, using one of the two alternative forms:</p> 
+        <pre>&lt;ident&gt; ... &lt;/ident&gt;</pre>
+        <p>or</p> 
+        <pre>&lt;ident/&gt;</pre>
+        <p>The first form may contain any number of child elements. </p> 
+        <p>An element may contain any number of attributes, of the form</p> 
+        <pre>name1="value1" name2="value2"</pre> 
+        <p>Each name must be an identifier, and each value is a string literal.</p> 
+        <p>Write a Scala program that implements a combinator parser for this language. An <code>hw6part3</code> object should read an expression from <code>System.in</code> and produce an instance of </p>
+        <pre>case class Element(name : String, attrs : List[(String, String)], children : List[Element])</pre>
+        <p>It's a little tricky to ensure that the start and end tag of an element match. Instead of using <code>^^</code>, use <code>^?</code> which allows you to supply a <em>partial</em> function—a match expression where not all cases are present. In my parser, I use a case like this:</p>
+        <pre>case i ~ a ~ ((c, Some(j))) <b>if i == j</b> =&gt; Element(j, a, c)</pre>
+        <p>Your parser may follow a different strategy, but the point is that you can use a <code>case</code> with an <code>if</code> to force the begin and end tags to match, and cause failure otherwise.</p>
+        <p>NB. I have no idea why I had to put parentheses around the pair <code>(c, Some(j))</code>, but it didn't work without them.</p>
+        <p>Put your parser into an object <code>hw6part3</code> in a file <code>src/main/scala/hw6part3.scala</code> whose body is</p>
+        <pre>val parser = new XMLLikeParser
+parser.parseAll(parser.list, new InputStreamReader(System.in)) match {
+  case parser.Success(result, next) =&gt; println(result)
+  case _ =&gt; println("Error")
+}</pre>
+        I will test this program by running
+        <pre>sbt -no-colors "runMain hw6part3" &lt; part3in1
+sbt -no-colors "runMain hw6part3" &lt; part3in2
+...
+</pre>
+        For example, if <code>part3in1</code> contains
+
+        <pre>&lt;greeting type="hello"&gt;&lt;text value="world"/&gt;&lt;/greeting&gt;</pre>
+        your program should print
+        <pre>Element(greeting,List((type,"hello")),List(Element(text,List((value,"world")),List())))
+</pre>
+      </li>
+    </ol>
+  </body>
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw6/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+</html>

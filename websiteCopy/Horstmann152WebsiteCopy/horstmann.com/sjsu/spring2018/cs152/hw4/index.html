@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw4/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:18 GMT -->
+<head>
+    <link href='../../../../styles.css' rel='stylesheet' type='text/css'/> 
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+  </head>
+  <body><h2>Homework 4</h2>
+    
+    <p>You will again use the sbt project structure</p>
+    
+    <pre>cs152 (or whereever you store your git repo)
+  hw4
+    src
+      main
+        scala
+          hw4.scala (in the default package)
+      test
+        scala
+          MyTestSuite.scala (in the default package)      
+</pre>
+    <p>All your work goes inside an</p>
+    <pre>object hw4 {
+  ...
+}
+</pre> <p>in <code>hw4.scala</code>.</p>
+    <p>In the test cases given below, I don't use the <code>hw4.</code> prefix because my test suite starts with</p>
+    <pre>import hw4._
+</pre>
+    <p>To test that the grader will be able to run your project, clone your repo into <code>/tmp/cs152</code>, change to the <code>hw4</code> directory, and run <code>sbt test</code>.</p>
+    <p><b>IMPORTANT:</b> Be sure to edit your <code>.gitignore</code> file so that you don't upload a lot of unnecessary stuff into your repo! See the instructions for homework 3.</p>
+    <ol><li>Reimplement the <code>tokens</code> function from Lecture 7 Lab Step 4. First, accept <em>two</em> lists of regex, the tokens that should be reported and those that should be ignored. (The latter would contain white space and comments). Next, return a <em>pair</em> consisting of a list of tokens that you found and an integer that indicates the index of the first error—the position in the original string where you were unable to find a match. If the entire input string matched, return -1.</li>
+      <li>
+        <p class='sideimage'><img src='phonepad.jpg' alt='phonepad'/></p> 
+        <p>Martin Odersky, the inventor of Scala likes to show off the power of Scala and functional programming with a solution of the “phone mnemonics” problem. Given a phone number, what word or word sequence spells it on a touch-tone pad? For example, given the phone number 435 569 6753, one should come up with the sequence <code>HELLO WORLD</code> (and maybe others).</p> 
+        <p>We'll do this in a different way than he does it in his presentations. I present this as a set of discoveries. Follow along in a worksheet, then put your work together into the final deliverable, a function <code>val phoneMnemonics = (digits: String) =&gt; ...</code> that yields a <code>List[String]</code>. Note that we will use <em><b>NO RECURSION</b></em>. That's why all the functions are written as <code>val</code>.</p>
+        <blockquote>And no constructs that we haven't covered in class. No <code>for/yield</code>. (Use <code>map</code> and <code>flatmap</code> instead.) No macros :-) </blockquote>
+        <p>You don't have to turn in the answers to the various questions in the following description—just the <code>phoneMnemonics</code> function and the various helper functions.</p>
+        <ol class='la'><li>What interesting word can you make from the number 72252? If you can't figure one out, it's ok—your program will do it for you soon enough.</li> 
+          <li>Declare a map that maps <code>"2"</code> to <code>"ABC"</code>, <code>"3"</code> to <code>"DEF"</code>, and so on. </li> 
+          <li>Actually, we want "2" to map to a <code>List</code> with three elements, <code>"A"</code>, <code>"B"</code>, <code>"C"</code>. But we don't want to type all that by hand. Here is a handy function that turns a string into a list of its characters:
+            <pre>val characters = (s: String) =&gt; s.toList.map("" + _)
+   // <cite>In Scala, a <code>String</code> is a <code>Seq[Char]</code></cite>
+</pre>Transform your map by adding 
+            <pre>.map(e =&gt; (e._1, characters(e._2)))
+</pre> Call the result <code>letters</code>—we'll need it in the next step.
+          </li> 
+          <li>Now it's trivial to find out the words that one can make with one digit, say <code>"2"</code>. It's just <code>letters("2")</code>. What if you have two digits, say <code>"2"</code> followed by <code>"3"</code>? Then you want to combine all elements of <code>letters("2")</code> with all elements of <code>letters("3")</code>. That's similar to the <code>flatMap</code> example in Lecture 6:
+            <pre>letters("3").flatMap(y =&gt; letters("2").map(x =&gt; x + y))
+</pre> Try it out and see what you get. Think about why the list order is switched.
+          </li> 
+          <li>It is useful to write a function that solves a more general problem. Given two lists of strings, get a list of all concatenations from both of them. 
+            <pre>val cats = (s: List[String], t: List[String]) =&gt; ...</pre> Implement this function. <br/>Test case: 
+            <pre>assert(cats(letters("2"), letters("3")).toSet
+  == Set("AD", "BD", "CD", "AE", "BE", "CE", "AF", "BF", "CF"))</pre>
+          </li> 
+          <li>Now write a function <code>wordsForDigits</code> that takes a string of digits between "2" and "9" and produces all strings that they can encode. 
+            <pre>val wordsForDigits = (digits: String) =&gt; ...</pre> Hint: First map to a list of strings for each digit. Then use <code>reduceLeft</code>.<br/> Test case: <code>assert(wordsForDigits("72252").contains("SCALA"))</code>
+          </li> 
+          <li>Read in all words from <code>/usr/share/dict/words</code>, as we did in Lecture 6. And remove those that start with an uppercase letter (which include a bunch of junk) as well as those of length 1. Turn it into a set for efficiency. And let's make them all uppercase. And let's add in "SCALA" which is weirdly missing. 
+            <pre>val words = io.Source.fromURL("http://horstmann.com/sjsu/spring2018/cs152/words").
+  getLines.filter(w =&gt; Character.isLowerCase(w(0)) &amp;&amp; w.length &gt; 1).
+  map(_.toUpperCase).toSet + "SCALA"</pre> Then improve the <code>wordsForDigits</code> function from the preceding step by filtering against the set.
+          </li> 
+          <li>Now when you run <code>wordsForDigits("72252")</code>, what do you get? What do you get for <code>wordsForDigits("72253")</code>?</li> 
+          <li><p>We've made a lot of progress, but we aren't quite there. The problem is a little harder. Given an arbitrary number like 7225247386, one is supposed to find the words "SCALA", "IS", "FUN" (and whatever other word sequences there might be hidden).</p> 
+            <p>Let's assume we have a particular way of breaking up the numbers, say into <code>List("72252", "47", "386")</code>. Using <code>wordsForDigits</code>, we get all the words for <code>"72252"</code>, <code>"47"</code>, and <code>"386"</code>. Now we want to concatenate them into a sentence.</p> 
+            <p>We've <em>almost</em> solved that problem before, when <code>wordsForDigits</code> called <code>reduce</code> with <code>cats</code> to glue together words. Give it a try: </p>
+            <pre>val wordsForDigitsSequence = (seq: List[String]) =&gt;
+  seq.map(e =&gt; wordsForDigits(e)).reduceLeft(cats)</pre> 
+            <p>What do you get for <code>wordsForDigitsSequence(List("72252", "47", "386"))?</code></p> 
+          </li> 
+          
+          <li>
+            <p>It would be easier to read the result if the words were separated by spaces. Make a copy of <code>cats</code>, call it <code>catsSpaces</code>, and make it separate the concatenated words by spaces. Then call <code>catsSpaces</code> instead of <code>cats</code> in <code>wordsForDigitsSequence</code>. What do you now get for <code>wordsForDigitsSequence(List("72252", "47", "386"))?</code></p> 
+          </li> 
+          <li>
+            <p>We are doing good. <em>If</em> we know how to break up a number (such as 7225247386) into all corresponding sequences (such as 72252 47 386 and many others), then we can find the corresponding words for each sequence.</p>
+            <p>Let's find all ways that a phone number can be broken up into (non-empty) sequences. For example, the phone number 1234 has 8 such decompositions: 1234, 12 34, 1 234, 1 2 34, 123 4, 12 3 4, 1 23 4, 1 2 3 4.</p> 
+            <p>That looks pretty random, but it's not so bad. Suppose you knew how to break up 234 (into 234, 23 4, 2 34, 2 3 4). Now you grow that by adding 1. There are two things you can do:</p> 
+            <ul>
+              <li>Add 1 all by itself: <b>1</b> 234, <b>1</b> 23 4, <b>1</b> 2 34, <b>1</b> 2 3 4</li> 
+              <li>Add 1 to the first string: <b>1</b>234, <b>1</b>23 4, <b>1</b>2 34, <b>1</b>2 3 4</li> 
+            </ul> 
+            <p>Let's do the first part. </p> 
+            <pre>val grow1 = (c: String, substringLists: List[List[String]]) =&gt; substrings.map(...)</pre> 
+            <p>For each list <code>s</code> in <code>substringLists</code>, you prepend <code>c</code>  (with <code>::</code>) the sequence <code>List(t.toString)</code>. </p> 
+            <p>What do you get for</p> 
+            <pre>grow1("1", List(List("234"),
+  List("23", "4"),
+  List("2", "34"),
+  List("2", "3", "4")))</pre>
+          </li> 
+          <li>
+            <p>On to <code>grow2</code>. There are two inputs: a string <code>c</code> with a single character such as <code>"1"</code>, and a <code>List[List[String]]</code> such as <code>List(List("234"), List("23", "4"), List("2", "34"), List("2", "3", "4"))</code>. Glue the character to the front of the first element of each list <code>s</code> in <code>substringLists</code>.</p> 
+            <pre>val grow2 = (c: String, substringLists: List[List[String]]) =&gt; map(...)</pre> 
+            <p>What do you get for </p> 
+            <pre>grow2("1", List(List("234"),
+  List("23", "4"),
+  List("2", "34"),
+  List("2", "3", "4")))</pre>
+
+          </li>
+          
+          <li>
+            <p>Now define</p> 
+            <pre>val grow = (c: String, a: List[List[String]]) =&gt; ...</pre> 
+            <p>to concatenate <code>grow1(c, a)</code> and <code>grow2(c, a)</code> (with <code>++</code>). </p> 
+            <p>Now you should get all expected patterns from</p>
+            <pre>grow("1", List(List("234"),
+  List("23", "4"),
+  List("2", "34"),
+  List("2", "3", "4")))</pre>           
+          </li> 
+          <li>
+            <p>What is the result of</p> 
+            <pre>grow("1", grow("2", grow("3", List(List("4")))))</pre>
+          </li> 
+          <li>
+            <p>This looks <strong>so</strong> promising. But why can't you use <code>grow</code> with <code>reduceRight</code>?</p>
+          </li>
+          
+          <li>Ok, we'll use <code>foldRight</code> instead. And we want this to work for arbitrary strings <code>s</code>, not just <code>"1234"</code>. Apply <code>foldRight</code> to the list <code>characters(s.substring(0, s.length - 1))</code>. What is the seed value? </li> 
+          <li>Implement <code>val substrings = (s: String) =&gt; ...</code>. What is <code>substrings("2728")</code>?</li> 
+          <li>Note that's a list of <code>List[String]</code>. What do you get when you call 
+            <pre>substrings("2728").map(wordsForDigitsSequence)</pre> 
+          </li> 
+          <li>Ok, that's not quite what we want. We don't want lists of lists. How do you flatten them out? (Don't change <code>substrings</code>—just figure out what you need to do with its result.)</li> 
+          <li>Now implement <code>val phoneMnemonics = (digits: String) =&gt; ...</code> that does this for any string of digits, not just <code>"2728"</code>. What is <code>phoneMnemonics("7225247386")</code>? </li>
+          <li>Pheew! You are done. Look, ma, no recursion. Scala is fun.</li>           
+          <li><b>Important:</b> You won't get any partial credit if the test suite can't compile. If you can't get everything done, make sure you define the remaining functions. All of them happen to return lists, so  define any unimplemented functions to return empty lists:
+        <pre>  val wordsForDigits = (digits: String) =&gt; Nil
+  val catsSpaces = (s: List[String], t: List[String]) =&gt; Nil
+  val wordsForDigitsSequence = (seq: List[String]) =&gt; Nil
+  val grow = (c: String, a: List[List[String]]) =&gt; Nil
+  val substrings = (s: String) =&gt; Nil
+  val phoneMnemonics = (digits: String) =&gt; Nil
+</pre>
+          </li>
+        </ol>
+      </li>
+    </ol>
+  </body>
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw4/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:18 GMT -->
+</html>

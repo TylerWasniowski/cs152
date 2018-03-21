@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture12/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 12</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>The Simple Language SL1</h1> 
+    <ul>
+      <li>Grammar 
+        <pre>block ::= (valdef | fundef)* expr
+expr ::= expr2 | "if" "(" expr ")" block "else" block 
+expr2 ::= term (( "+" | "-" ) term)*
+term ::= factor (( "*" | "/" ) factor)*
+factor ::= wholeNumber | "(" expr ")" | ident | funcall | funliteral
+funcall ::= ident "(" (expr ("," expr)*)? ")"
+funliteral ::= "{" (ident ("," ident)*)? "=&gt;" block "}"
+valdef ::= "val" ident "=" expr ";"
+fundef ::= "def" ident "=" funliteral ";"</pre> 
+      </li> 
+      <li>Similar to Scala subset, but 
+        <ul>
+          <li>Only two types: integer and functions</li> 
+          <li>No compile-time type checking</li> 
+          <li><code>if</code> fakes <code>Boolean</code> similar to C: &gt; 0 is true, &lt;= 0 is false</li> 
+          <li>Definitions end in semicolons</li> 
+          <li>Block has a single expression</li> 
+          <li>Function literals have syntax <code>{ ident, ident, ... =&gt; block }</code></li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Some SL1 Examples</h1> 
+    <ul>
+      <li>Simple computation: 
+        <pre>val a = 3;
+val b = 4;
+a * a + b * b</pre> 
+      </li> 
+      <li>A function literal and a function call 
+        <pre>val max = { x, y =&gt; if (x - y) x else y };
+max(3, 4)</pre> 
+      </li> 
+      <li>A higher-order function 
+        <pre>val threeTimes = { f, x =&gt; f(f(f(x))) }; 
+threeTimes({x =&gt; x * x}, 2)</pre> 
+      </li> 
+      <li>A recursive function 
+        <pre>def fac = { x =&gt; if (x) x * fac(x - 1) else 1 };
+fac(10)</pre> 
+      </li> 
+    </ul> 
+    <h1>Interpreter Outline</h1> 
+    <ul>
+      <li>Parse the program, converting into <code>Expr</code> (as before) / <code>Block</code></li> 
+      <li><code>Block</code> is sequence of definitions, followed by <em>one</em> expression</li> 
+      <li>Need to add capabilities to <code>eval(Expr)</code> 
+        <ul>
+          <li><code>if / else</code></li> 
+          <li>function call</li> 
+        </ul> 
+      </li> 
+      <li>Evaluating block: 
+        <ul>
+          <li>Add definitions to symbol table</li> 
+          <li>Evaluate expression with that table</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>The Symbol Table</h1> 
+    <ul>
+      <li>We had a lab (<a href='http://horstmann.com/sjsu/spring2018/cs152/parsing2/index.html'>in this lecture</a>) with evaluating variable definitions</li> 
+      <li>In that lab, we used a <code>Map[String, Int]</code> for the symbol table.</li> 
+      <li>Issue #1: Not all values are of type <code>Int</code> (i.e. functions)</li> 
+      <li>Remedy: Use <code>Any</code></li> 
+      <li>Issue #2: We may have duplicate variable definitions 
+        <pre>val a = 3;
+val fun = { x =&gt; val a = 2; a * x };
+a * fun(4)</pre> 
+      </li> 
+      <li>Remedy: Use a <code>List[(String, Any)]</code> instead</li> 
+      <li>To add a definition, use <code>::</code></li> 
+      <li>Newer definitions at the front shadow the older ones 
+        <pre>((a, 2), (x, 4), (a, 3))</pre> 
+      </li> 
+      <li>To look up a symbol's value, use <code>find</code> to find the first match: 
+        <pre>symbols.find(_._1 == name) match { 
+  case Some(pair) =&gt; pair._2 
+  case None =&gt; None 
+} </pre> 
+      </li> 
+    </ul> 
+    <h1>Evaluating Expressions</h1> 
+    <ul>
+      <li><code>eval</code> of an expression yields a value</li> 
+      <li>Need symbol table for looking up variables</li> 
+      <li>Result may be either an <code>Int</code> or a function 
+        <pre>val a = 3 * b;
+val sq = { x =&gt; x * x };</pre> 
+      </li> 
+    </ul> 
+    <pre>def eval(expr : Expr, symbols : List[(String, Any)]) : Any = 
+  expr match {
+    case Number(num) =&gt; num
+    case Variable(name) =&gt; ... // find name in symbols   
+    case Operator(left, right, f) =&gt; ...
+      // was f(left, right), but now we don't know they are Int
+    case IfExpr(cond, block1, block2) =&gt; ...
+    ...
+  }</pre> 
+    <h1>Evaluating Blocks</h1> 
+    <ul>
+      <li>Block = list of definitions + one expression</li> 
+      <li>Evaluate all definitions</li> 
+      <li>Add pairs to symbol table 
+        <pre>def evalDef(symbols : List[(String, Any)], defn : Valdef) =
+  (defn.name, eval(defn.expr, symbols)) :: symbols</pre> 
+      </li> 
+      <li>(Additional wrinkle with function definitions—later)</li> 
+      <li>Use resulting table to evaluate expression 
+        <pre>def evalBlock(block : Block, symbols : List[(String, Any)]) : Any =
+  eval(block.expr, (symbols /: block.defs) { evalDef(_, _) } )</pre> 
+        <p>Visualize foldLeft with two definitions: (red fringe = list of defs)</p> 
+        <pre>             symbols
+             for expr
+           /        \
+       augmented    <strong>2nd</strong>
+        symbols     <strong>def</strong>
+        /   \ 
+original    <strong>1st</strong> 
+symbols     <strong>def</strong></pre> 
+      </li> 
+    </ul> 
+    <h1>Parsing Challenge: Function Calls</h1> 
+    <ul>
+      <li>Lookahead required to distinguish between <code>variable</code> and <code>function(args)</code></li> 
+      <li>Parse with optional parameter list</li> 
+      <li>If found, generate a <code>Funcall</code>, else a <code>Variable</code> 
+        <pre>def valOrFuncall = valOrFun ~ opt( "(" ~&gt; repsep(expr, ",") &lt;~ ")" ) ^^ { 
+  case expr ~ Some(args) =&gt; Funcall(expr, args)
+  case expr ~ None =&gt; expr 
+}  </pre> 
+      </li> 
+      <li>Lookahead problem isn't limited to names. <code>{ x =&gt; x * x }</code> is a function literal, <code>{ x =&gt; x * x }(3)</code> is a function call. 
+        <pre>def valOrFun = "(" ~&gt; expr &lt;~ ")" |       
+  ident ^^ { Variable(_) } | 
+  funliteral
+  
+def funliteral: Parser[Expr] = ("{" ~&gt; repsep(ident, ",") &lt;~ "=&gt;") ~ expr &lt;~ "}" ^^ { 
+  case params ~ expr =&gt; Function(params, expr) 
+}</pre> 
+      </li> 
+      <li>Note: <code>repsep(ident, ",")</code>matches comma-separated list of <code>ident</code>, yielding a <code>List[String]</code> (with the separators discarded) </li> 
+    </ul> 
+    <h1>Calling a Function</h1> 
+    <ul>
+      <li>Inputs: 
+        <ul>
+          <li>Function with parameter list and block, e.g. <code>{ x, y =&gt; (x + y) / 2 }</code></li> 
+          <li>List of parameters, e.g. <code>(10, a + 2)</code></li> 
+        </ul> 
+      </li> 
+      <li>Add bindings (param name, param value) to symbol table 
+        <p><code>x -&gt; eval(10)</code></p> 
+        <p><code>y -&gt; eval(a + 2)</code></p> 
+      </li> 
+      <li>Evaluate body with that symbol table 
+        <pre>def eval(expr : Expr, symbols : List[(String, Any)]) : Any = 
+  expr match {
+    case Funcall(fun, args) =&gt; eval(fun, symbols) match {
+      case Function(params, body) =&gt;
+        evalBlock(body, params.zip(args.map(eval(_, symbols))) ::: symbols)         
+    }  </pre> 
+      </li> 
+      <li><code>params.zip(args)</code> makes a list of pairs <code>((p1, a1), (p2, a2), ...)</code></li> 
+      <li>But we need to evaluate the arguments. The <code>map</code> takes care of that</li> 
+      <li>Parser and interpreter has &lt; 150 lines of code!</li> 
+      <li>Still need to discuss what to do with recursive function—next class</li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab11/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Becoming Comfortable with SL1</h1> 
+    <ol>
+      <li>Make a project <code>lab11</code> and add <a href='http://horstmann.com/sjsu/spring2018/cs152/lecture12/SL1.scala'>this Scala code</a>. Run the four SL1 programs from slide 3. What outputs do you get?</li> 
+      <li>Write a SL1 program that defines <code>pow2</code> to compute 2<sup>n</sup> for a given n, then calls <code>pow2(10)</code>. What is your program and what is its output?</li> 
+    </ol> 
+    <h1>Step 2: Understanding the Parse Tree</h1> 
+      <p>For each of the following SL1 expressions and blocks, draw a parse tree. That should be the tree returned by <code>parser.parse(...).get</code>. Write the tree sideways with indentations, like this for the expression <code>x * (y + 1)</code>. Use <code>-</code> for indentations so they don't get lost in your report.</p>
+      <p>Feel free to modify the program to print the parse tree.</p>
+    <pre>Operator
+-Variable(x)
+-Operator
+--Variable(y)
+--Number(1)
+--&lt;add function&gt;
+-&lt;multiply function&gt;</pre> 
+    <ol>
+      <li><code>{ x, y =&gt; x + y }</code></li> 
+      <li><code>fac(x - 1)</code></li> 
+      <li><code>val sq = { x =&gt; x * x } ; sq(2)</code></li> 
+    </ol> 
+    <h1>Step 3: Understanding Symbol Tables</h1> 
+    <p>For each of the following scenarios, write the symbol table. Write it as a set of equations, like this</p> 
+    <pre>a = 3
+sq = { x =&gt; x * x }
+a = 2</pre> 
+    <p>where the newest symbols appear at the <em>bottom</em>. In our example, the last definition of <code>a</code> shadows the previous one. Note that each variable is bound either to an integer or a function. </p> 
+    <ol>
+      <li>At the end of the program <code>val a = 3 ; val b = a + 1; val a = 2 ; a + b</code> </li> 
+      <li>At the execution of the function call in the program <code>val a = 3; val sq = { x =&gt; x * x } ; sq(a + 2)</code>. Be sure to show the binding for <code>x</code>.</li> 
+      <li>At the execution of the function call in the program <code>val a = 3; val x = 2; { x =&gt; a * x } (a)</code></li> 
+    </ol> 
+    <p>Confirm your guesses for 2 and 3 with this trick. Define a function</p> 
+    <pre>def spy[T](t : T) = { println(t); t }</pre> 
+    <p>Then add a <code>spy(...)</code> call around</p> 
+    <pre>params.zip(args.map(eval(_, symbols))) ::: syms</pre> 
+    <p>in the evaluation of a <code>Funcall</code>.</p> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture12/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+</html>

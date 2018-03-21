@@ -1,0 +1,9 @@
+/*==========================================================================================
+Filename:		faculty-profile.css
+Purpose:		Provides style for faculty profiles
+Created by:		Web Services
+Created:		11/05/14 16:11
+Last Modified:	11/06/14 08:34 (bds)
+===========================================================================================*/
+
+.facultyprofile--photo {display:block; float:right; margin-left:10px; width:100%; height:auto; max-width:138px;}

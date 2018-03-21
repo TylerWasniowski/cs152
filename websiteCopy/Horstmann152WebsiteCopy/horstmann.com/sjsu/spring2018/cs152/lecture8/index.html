@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture8/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:18 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 8</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Scala Classes</h1> 
+    <ul>
+      <li>A simple class: 
+        <pre>class Point(val x: Double, val y: Double) {
+  def move(dx: Double, dy: Double) = new Point(x + dx, y + dy)
+  def distanceFromOrigin = math.sqrt(x * x + y * y)
+  override def toString = "(" + x + ", " + y + ")"
+}</pre> 
+      </li>
+      <li>Constructor with two arguments.<pre>val myFirstPoint = new Point(3, 4)</pre></li>
+      <li>Five methods: <code>x</code>, <code>y</code>, <code>move</code>, <code>distanceFromOrigin</code>, <code>toString</code></li> 
+      <li>Need <code>override</code> when overriding methods (here <code>Object.toString</code>)</li> 
+      <li>No <code>()</code> for parameterless accessor methods</li> 
+    </ul> 
+
+    <h1>Construction Parameters</h1> 
+    <ul><li><code>val</code> parameter gives rise to instance variable and accessor
+        <pre>Point(val x, val y)
+</pre></li>
+      <li>Parameter without <code>val</code> gives rise to instance variable without accessor. 
+        <pre>class Rand(gen: java.util.Random) { // <cite>No <code>val</code></cite>
+  def value = gen.nextInt()
+}</pre></li>
+      <li>Can also have private instance variable
+        <pre>class Rand {
+  private val gen = new java.util.Random(42)
+  def value = gen.nextInt()
+}
+</pre></li>
+      <li>Calling superclass constructor:
+        <pre>class LabeledPoint(x: Double, y: Double, val label: String)
+  extends Point(x, y)
+</pre></li>
+</ul>
+
+    <h1>Scala Objects</h1> 
+    <ul><li>Scala <code>object</code> = class with only one instance</li> 
+      <li>Extend the <code>App</code> trait (similar to an interface) for an application object:
+        <pre>object Main extends App {
+  println("My first Scala App")
+}</pre> </li>
+      <li>A class can have a <em>companion object</em> with methods that are similar to <code>static</code> methods in Java. Examples:
+        <pre>List.tabulate
+Source.fromURL
+</pre></li>
+      <li>In Scaladoc, click on the circle with C or T to switch to the companion object, denoted with O</li>
+      <li><code>math.ceil</code> is <em>not</em> defined in an object—it's in the <code>scala.math</code> <em>package</em></li>
+      </ul> 
+
+    <h1>Case Classes </h1> 
+    <ul>
+      <li>Special kind of class, optimized for <em>matching</em> 
+        <pre>case class ClassName(field1 : Type1, field2 : Type2, ...) extends Superclass</pre> 
+      </li> 
+      <li>Example: Binary tree with values only in the leaves 
+        <pre>abstract class SimpleTree
+case class Leaf(value : Int) extends SimpleTree
+case class Node(left : SimpleTree, right : SimpleTree) extends SimpleTree </pre> 
+      </li> 
+      <li>Construct instances with <code>ClassName(arg1, arg2, ...)</code> 
+        <pre>Node(Node(Leaf(3), Leaf(2)), Node(Leaf(7), Node(Leaf(6), Leaf(8))))</pre> 
+        <p><img height='281' width='464' src='bintree.png' alt=''/></p> 
+      </li> 
+    </ul> 
+    <h1>Pattern Matching</h1> 
+    <ul>
+      <li>
+        <pre>selectorExpr match { 
+   case pattern =&gt; expr 
+   ... 
+   case pattern =&gt; expr 
+}</pre> 
+      </li> 
+      <li>Many possibilities for the patterns; we care about case classes</li> 
+      <li>
+        <pre>tree match {
+  case Node(l, r) =&gt; expr1
+  case Leaf(v) =&gt; expr2
+}</pre> 
+      </li> 
+      <li>Variables <code>l</code>, <code>r</code>, <code>v</code> are bound to the values in the case class instances; you can use them in the expressions. 
+        <pre>def sum(t : SimpleTree) : Int = t match { 
+  case Node(l, r) =&gt; sum(l) + sum(r) 
+  case Leaf(v) =&gt; v 
+}</pre> 
+      </li> 
+      <li>Matches are tried in order. To have a default, use the “wildcard” pattern at the end 
+        <pre>case _</pre> 
+      </li> 
+    </ul> 
+    <h1>Syntax Trees</h1> 
+    <ul>
+      <li>Tree that represents the syntax of a program (or a program part)</li> 
+      <li>Example: Expression tree for <code>3 + 4 * x</code> 
+        <p><img height='251' width='227' src='exprtree.jpg' alt=''/></p> 
+      </li> 
+      <li>Model in Scala: 
+        <pre>class Expr
+case class Number(value : Int) extends Expr
+case class Variable(name : String) extends Expr
+case class Operator(left : Expr, right : Expr, 
+  f: (Int, Int) =&gt; Int) extends Expr</pre> 
+        <pre>Operator(Number(3), Operator(Number(4), Variable("x"), _ * _), _ + _)</pre> 
+      </li> 
+      <li>Next lecture: How to <em>parse</em> <code>3 + 4 * x</code> into Scala value</li> 
+    </ul> 
+    <h1>Syntax Tree Evaluation</h1> 
+    <ul>
+      <li>Compute value of expression</li> 
+      <li>Need values of free variables</li> 
+      <li>Use a <code>Map[String, Int]</code></li> 
+      <li>Scala immutable map refresher: 
+        <ul>
+          <li><code>Map(key1 -&gt; value1, key2 -&gt; value2, ...)</code> yields map with given key/value pairs</li> 
+          <li><code>map + (key -&gt; value)</code> yields map with new key/value pair</li> 
+          <li><code>map(key)</code> yields value of key (must exist)</li> 
+          <li><code>map.get(key)</code> yields <code>Option</code>, either <code>Some(value)</code>or <code>None</code></li> 
+        </ul> 
+      </li> 
+      <li>
+        <pre>def eval(expr : Expr, symbols : Map[String, Int]) : Int = 
+  expr match {
+    case Number(num) =&gt; num
+    case Variable(name) =&gt; symbols(name)
+    case Operator(left, right, f) =&gt; f(eval(left, symbols), eval(right, symbols))
+  }</pre> 
+      </li> 
+    </ul> 
+    <h1>Functions with Variable Arguments</h1>
+
+    <ul><li>Want to call a function as:
+        <pre>val result = sum(1, 7, 2, 9)
+val result2 = sum(3, 1, 4, 1, 5, 9, 2, 6)</pre></li>
+      <li>Define the argument type as <code>Int*</code>
+        <pre>def sum(args: Int*) = args.reduce(_ + _)</pre></li>      
+      <li>Argument is wrapped into a <code>Seq[Int]</code></li>
+      <li>If you already have a <code>Seq[Int]</code>, you cannot pass it directly.</li>
+      <li>Use <code>: _*</code> ascription:
+        <pre>val s = sum(1 to 5: _*) // <cite>Consider 1 to 5 as an argument sequence</cite>
+</pre></li>
+      <li>Necessary in recursive definitions:
+        <pre>def recursiveSum(args: Int*) : Int = {
+  if (args.length == 0) 0
+  else args.head + recursiveSum(args.tail : _*)
+}</pre></li>
+    </ul>
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab7/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1</h1> 
+    <p>Add the classes <code>Expr</code>, <code>Number</code>, <code>Variable</code>, <code>Operator</code> to a  Main.scala file, inside a <code>Main</code> object. Add the <code>eval</code> method to the <code>Main</code> object. In the body of the <code>Main</code> object, construct the tree </p> 
+    <p><img height='251' width='227' src='exprtree.jpg' alt=''/></p> 
+    <p>print it and and evaluate it with a symbol table in which <code>x</code> is 5. What is the code of your Main.scala file?</p> 
+    <h1>Step 2</h1> 
+    <p>Now we want to process variable definitions (which we will write as <code>val x = expr</code> in the next lecture). For now, we will assume that they are already parsed into instances of </p> 
+    <pre>case class Definition(name : String, expr : Expr)</pre> 
+    <p>For example, a definition <code>val x = 2</code> would be a <code>Definition("x", Number(2))</code>. A definition changes the symbol table. In a functional setting, that means we need to return a new table that contains all bindings in the old table and the new binding. For example,</p> 
+    <pre>val def1 = Definition("x", Number(2))
+val def2 = Definition("y", Variable("x"))
+val sym0 = Map[String, Int]()
+val sym1 = eval(def1, sym0) // "x" -&gt; 2
+val sym2 = eval(def2, sym1) // "x" -&gt; 2, "y" -&gt; 2
+System.out.println(sym2)</pre> 
+    <p>Implement this <code>eval</code> method. What is the code of your method? (You can get the fields of a definition as <code>defi.name</code>, <code>defi.expr</code>.) </p> 
+    <p>Note: This <code>eval</code> method requires you to call the <code>eval</code> method that we defined for expressions, but it is a different method—it consumes a definition and a symbol table, yielding another symbol table.</p> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture8/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:18 GMT -->
+</html>

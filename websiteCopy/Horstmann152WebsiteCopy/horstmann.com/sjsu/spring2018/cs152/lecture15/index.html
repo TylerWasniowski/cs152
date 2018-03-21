@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture15/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 15</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Review</h1> 
+    <ul>
+      <li>Parentheses syntax 
+        <pre>(+ 1 2)
+(define (fac n) (if (= n 0) 1 (* n (fac (- n 1)))))</pre> 
+      </li> 
+      <li>Anonymous functions 
+        <pre>(map <strong>(λ (x) (* x x))</strong> '(1 2 3))  ; (1 4 9)</pre> 
+      </li> 
+      <li>Let expressions 
+        <pre>(let ([x 1] [y 2]) (+ x y))</pre> 
+      </li> 
+      <li>Lists: <code>first</code>, <code>rest</code>, <code>cons</code>, <code>empty</code>, <code>empty?</code> 
+        <pre>(define (sum lst)
+  (if (empty? lst) 
+    0 
+    (+ (first lst) (sum (rest lst)))))</pre> 
+      </li> 
+    </ul> 
+    <h1>Apply and Eval</h1> 
+    <ul>
+      <li>Apply an arbitrary function to a list of arguments 
+        <pre>(define circles (map circle '(10 20 30))) ; <cite>A list <code>(c1 c2 c3)</code></cite>
+(apply hc-append circles) ; <cite>Same as calling <code>(hc-append c1 c2 c3)</code></cite></pre> 
+      </li> 
+      <li>Evaluate an arbitrary expression 
+        <pre>(define expr '(+ 3 4)) ; <cite><code>expr</code> is a list of three items</cite>
+(eval expr) ; <cite>Evaluates expression in list—result is 7</cite></pre> 
+      </li> 
+      <li>Can generate arbitrary code and execute it later. 
+        <pre>(define (fac n) (apply * (range 1 n)))
+(define (fac n) (eval (cons '* (range 1 n))))</pre> 
+        <p>Here <code>range</code> is</p> 
+        <pre>(define (range from to) 
+  (if (&gt; from to) empty 
+      (cons from (range (+ from 1) to))))</pre> 
+      </li> 
+    </ul> 
+    <h1>Defining eval/apply in Scheme</h1> 
+    <p class='sideimage'><img height='223' width='226' src='wizard-book.jpg' alt=''/></p> 
+    <ul>
+      <li>We can define <code>eval</code> in Scheme</li> 
+      <li>Gives precise formulation of language semantics</li> 
+      <li>Allows to study implementation of language dialects</li> 
+      <li>“Meta-circular interpreter”—<code>eval</code> can evaluate <em>itself</em></li> 
+      <li>See the “Wizard book” 
+        <p>Abelson and Sussman, Structure and Interpretation of Computer Programs, MIT Press, 1993. Free book at <a href='http://mitpress.mit.edu/sicp'>http://mitpress.mit.edu/sicp</a></p> 
+      </li> 
+    </ul> 
+    <h1>Responsibilities of eval and apply</h1> 
+    <p><img height='154' width='385' src='eval-apply.gif' alt=''/></p> 
+    <p></p> 
+    <ul>
+      <li><code>eval</code> and <code>apply</code> call each other</li> 
+      <li><code>(eval exp env)</code>  
+        <ul>
+          <li>evaluates all terms of an expression in a given environment</li> 
+          <li>applies the first term (which must be a procedure) to the others</li> 
+        </ul> 
+      </li> 
+      <li><code>(apply proc args)</code> 
+        <ul>
+          <li>constructs an environment from the procedure's environment and the parameters</li> 
+          <li>evaluates all expressions of the procedure's body in that environment</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>eval</h1> 
+    <pre>(define (eval exp <strong>env</strong>) ; <cite><code>env</code> contains bindings of names to values</cite>
+  (cond ((self-evaluating? exp) exp)
+        ((variable? exp) (lookup-variable-value exp env))
+        ((quoted? exp) (text-of-quotation exp))
+        ((assignment? exp) (eval-assignment exp env))
+        ((definition? exp) (eval-definition exp env))
+        ((if? exp) (eval-if exp env))
+        ((lambda? exp)
+         (make-procedure (lambda-parameters exp)
+                         (lambda-body exp)
+                         env))
+        ((begin? exp) 
+         (eval-sequence (begin-actions exp) env))
+        ((cond? exp) (eval (cond-&gt;if exp) env))
+        ((application? exp)
+         (<strong>apply</strong> (eval (operator exp) env)
+                (list-of-values (operands exp) env)))
+        (else
+         (error "Unknown expression type -- EVAL" exp))))</pre> 
+    <h1>apply</h1> 
+    <pre>(define (apply procedure arguments)
+  (cond ((primitive-procedure? procedure)
+         (apply-primitive-procedure procedure arguments))
+        ((compound-procedure? procedure)
+         (<strong>eval</strong>-sequence
+           (procedure-body procedure)
+           (extend-environment
+             (procedure-parameters procedure)
+             arguments
+             (procedure-environment procedure))))
+        (else
+         (error
+          "Unknown procedure type -- APPLY" procedure))))</pre> 
+    <h1>Limits of Computation</h1> 
+    <p class='sideimage'><img height='401' width='500' src='alan-turing.jpg' alt=''/></p> 
+    <ul>
+      <li>Programs that can interpret themselves are important for reasoning about the limits of computation</li> 
+      <li>Turing's Halting Problem 
+        <p>It is not possible to write a program that checks whether a program will terminate on all inputs</p> 
+      </li> 
+      <li>Suppose it was possible to write <code>(halt-checker '(lambda (x) expr))</code> in Scheme 
+        <ul>
+          <li>returns <code>#t</code> if <code>(expr x)</code> halts for all <code>x</code></li> 
+        </ul> 
+      </li> 
+      <li>Now consider this function (let's call it <code>k</code>) 
+        <pre>(lambda (x) (if (halt-checker x) 
+  (letrec ([loop (lambda () (loop))]) (loop)) 
+  #t))</pre> 
+      </li> 
+      <li>What is <code>(k k)</code>? </li> 
+    </ul> 
+    <h1>Macros</h1> 
+    <ul>
+      <li>Easy to write Scheme code that generates Scheme code</li> 
+      <li>Would like to write code that <em>consumes</em> Scheme code 
+        <ul>
+          <li>before it is evaluated</li> 
+          <li>Example: Make our own <code>while</code> statement</li> 
+        </ul> 
+        <pre>(while (&gt; x 0) do (print x) (newline) (set! x (- x 1)))</pre> 
+      </li> 
+      <li>Can do it with closures, but that's not so pretty 
+        <pre>(while-do (λ () (&gt; x 0)) (λ () (print x) (newline) (set! x (- x 1))))</pre> 
+      </li> 
+      <li><em>Macros</em> are processed before evaluation 
+        <pre>(define-syntax while ...)</pre> 
+      </li> 
+    </ul> 
+    <h1>A Swap Macro</h1> 
+    <pre>(define-syntax swap!
+    (syntax-rules () ; <cite>No keywords—we'll see those later</cite>
+        (
+          (swap! a b) ; <cite>Match this pattern</cite>
+          (let ((c a)) ; <cite>Replace with this code</cite>
+            (set! a b)
+            (set! b c))
+        )
+        ; <cite>Other (<var>pattern</var>, <var>code</var>) pairs can come here, e.g. <code>(swap! a b c)</code></cite>
+)))</pre> 
+    <ul>
+      <li>Try it out 
+        <pre>(define u 1) (define v 2)
+(swap! u v) ; <cite>Now <code>u</code> is 2, <code>v</code> is 1</cite></pre> 
+      </li> 
+      <li>“hygienic”—works even if we call <code>(swap! x c)</code></li> 
+    </ul> 
+    <h1>Keywords and Varargs</h1> 
+    <pre>(define-syntax while
+    (syntax-rules (do) ; <cite><code>do</code> is a keyword</cite>
+      ((while condition do body ...) ; <cite><code>body</code> is a sequence of terms</cite>
+       (letrec ([loop (lambda ()
+                        (if condition
+                            (let ()
+                              body ...
+                              (loop))
+                            #f))]) (loop)))))</pre> 
+    <p></p> 
+    <h1>Recursive Definitions</h1> 
+    <pre> (define-syntax reverse 
+    (syntax-rules ()
+      ; <cite>First case terminates recursion</cite> 
+      ((reverse e) (list e)) ; <cite>or <code>(cons e nil)—</code><code>(e)</code> would try to evaluate <code>e</code></cite>
+      ; <cite>Second case invokes macro recursively</cite>
+      ((reverse e es ...) (append (reverse es ...) (list e)))))</pre> 
+    <ul>
+      <li>Try it out: 
+        <pre>(reverse 1 2 3 4) ; <cite>yields <code>'(4 3 2 1)</code></cite></pre> 
+      </li> 
+      <li>Just a silly example, but the same technique can be used to implement <code>let*</code> and others as macros</li> 
+      <li>Details <a href='ftp://ftp.cs.indiana.edu/pub/scheme-repository/doc/pubs/iucstr356.ps.gzftp://ftp.cs.indiana.edu/pub/scheme-repository/doc/pubs/iucstr356.ps.gz'>get</a> <a href='http://www.xs4all.nl/~hipster/lib/scheme/gauche/define-syntax-primer.txt'>complex</a> quickly</li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../sjsu/images/lab.html' alt='???'/></p> 
+    <h1>Step 1 - Code Generation</h1> 
+    <p>In this step, we will write Scheme code that reads and writes Scheme expressions such as the following:</p> 
+    <pre>(define poly '(lambda (x) (+ (* x x) (* x 2) 10))) ; <cite>Note the quote</cite></pre> 
+    <ol class='lower-alpha'>
+      <li>What is the type of the value to which <code>poly</code> is set?</li> 
+      <li>How do you compute the value of this polynomial when <em>x</em> is -1? </li> 
+      <li>Now we want to compute derivatives of such polynomials. We'll assume that each <code>*</code> has only two arguments, and that the expression contains only <code>+</code> and <code>*</code> as operators. 
+        <p>Write a helper function <code>(deriv expr var)</code> that computes the derivative with respect to the given variable. For example, </p> 
+        <pre>(deriv '(+ (* t t) (* t 2)) 't) 
+  ; <cite>yields <code>'(+ (+ (* 1 t) (* t 1)) (+ (* 1 2) (* t 0)))</code></cite>  ; <cite>maybe in a different order</cite></pre> 
+        <p>What is the code of your helper function?</p> 
+      </li> 
+      <li>Now write a function <code>derivative</code>, so that 
+        <pre>(derivative poly)</pre> 
+        <p>is a list of the form <code>(lambda (var) ...)</code> </p> 
+        <p>What is the code of your function?</p> 
+      </li> 
+      <li>Now give the values of the derivative for x = -20 ... 20 (Hint: <code>range</code> from the slides and <code>map</code>) 
+        <p>What expression do you use?</p> 
+      </li> 
+    </ol> 
+    <h1>Step 2 - An Enhanced <code>for</code> Loop</h1> 
+    <p>In this step, we want to make a macro for a Java-style loop over the elements of a list, like this:</p> 
+    <pre>(for i in '(1 2 3 4 5) do (print i) (newline))</pre> 
+    <ol class='lower-alpha'>
+      <li>What Scheme code should the macro generate? (Hint: <code>map</code>) 
+        <p>Write down the exact code you want to generate for this example.</p> 
+      </li> 
+      <li>The variable <code>i</code> in the <code>for</code> statement was not declared previously, and that's how we like it. Where does it get defined? (Hint: Look at the <code>lambda</code> that the <code>map</code> gets.)</li> 
+      <li>What are the keywords of your macro? </li> 
+      <li>What pattern do you match?</li> 
+      <li>What is your macro?</li> 
+      <li><em>Exactly</em> what gets printed when you run the <code>for</code> statement above? Is there something you can/should do to improve that? </li> 
+      <li>How can you make the <code>do</code> optional? </li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture15/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:21 GMT -->
+</html>

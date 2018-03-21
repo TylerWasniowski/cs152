@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw2/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+<head>
+    <link href='../../../../styles.css' rel='stylesheet' type='text/css'/> 
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+  </head>
+  <body><h2>Homework 2</h2>
+
+    <p>The purpose of this homework is to practice recursion. You cannot use any mutation—no <code>var</code>, no arrays, no Java collections, no mutable Scala collections. That makes <code>while</code> loops pretty useless, so don't even try that. Also, no use of any library function other than <code>String.length</code>, <code>String.contains</code>, <code>String.substring</code>, <code>String.replace</code>, except in the third problem, where you are allowed one call to <code>List.map</code>.</p>
+    <p>Again, the one and only point is to practice recursion. We don't care about implementing these functions any other way, and there will be no partial credit for any submission that uses any forbidden construct.</p>
+    
+    <ol><li>Write a Scala function
+        <pre>def subs(s: String) : String</pre> that yields all “subset strings” of a given string, obtained by a subset of the letters in the same order. For example, the subset strings of <code>"Amy"</code> are:
+        <pre>""
+"A"
+"m"
+"y"
+"Am"
+"Ay"
+"my"
+"Amy"
+</pre> Note that <code>"Ay"</code> is a subset string but not a substring. The order matters—<code>"ym"</code> is not a subset string. If the original string has length <var>n</var>, there are 2<sup><var>n</var></sup> subset strings. Return a <em>string</em> that concatenates all of the subset strings, separated by <code>|</code>. You can produce them in any order. One acceptable answer for <code>subs("Amy")</code> is
+        <pre>"|A|m|Am|y|Ay|my|Amy"</pre></li>
+      <li>Write a Scala function
+        <pre>lcs(a: String, b: String) : String
+</pre> that produces the longest substring (in the normal meaning, not that of the preceding exercise) that is common to both <code>a</code> and <code>b</code>. For example, <code>lcs("permission", "cruise missile")</code> is <code>"missi"</code>. If there are multiple common substrings of the same maximal length, you can produce any one of them. Don't use dynamic programming. Simply call the <code>contains</code> method with suitable substrings of decreasing length. However, don't be too wasteful—your implementation must run in O(<var>n</var><sup>3</sup>) time, where <var>n</var> is <code>max(a.length(), b.length())</code>. Hint: If <code>b.contains(a)</code>, you have the answer. If not, you can try shorter substrings of <code>a</code>. Either the substring contains the initial letter of <code>a</code>—there are O(<var>n</var>) such substrings that you can handle with a helper function. Or you can solve the original problem with simpler inputs.</li>
+
+      <li>Write a scala function <pre>onebits(n: Int) : List[Int]</pre> that returns a list of positions where the binary representation of <code>n</code> has a bit of 1. For example, <code>onebits(13)</code> is <code>List(0, 2, 3)</code> because in binary, 13 is 1101, and the powers 2<sup>0</sup>, 2<sup>2</sup>, and 2<sup>3</sup> have coefficients of 1. Don't use a library function that converts <code>n</code> to a binary/octal/hex string. Hint: How can you compute <code>onebits(n)</code> from <code>onebits(n / 2)</code>? Use <code>map</code>!</li>
+        
+      
+    </ol>
+    <p>You turn in three files in the <code>hw2</code> subdirectory of your repo:</p>
+    <ul><li><code>hw2.scala</code>:
+        <pre>object hw2 {
+  def subs(s: String) : String = 
+    ...  
+  def lcs(a: String, b: String) : String = 
+    ...
+  def onebits(n: Int) : List[Int] =
+    ...
+}</pre></li>
+      <li><code>hw2test.scala</code>:
+        <pre>object hw2test extends App {
+  println(hw2.lcs("Mary had a little lamb", "Its fleece was white as snow"))
+  // your other test cases
+}
+</pre></li>
+      <li><code>hw2.txt</code>: Explain in plain English for each of your solutions how/why the recursion works. Why does it terminate? Why does it give the right answer?</li>
+    </ul>
+    <p>If you want to test what the grader will do (always a good idea), you need to first <a href='http://www.scala-sbt.org/download.html'>install sbt</a>. Then run</p>
+    <pre>cd /tmp
+echo hw2 | sbt new sbt/scala-seed.g8
+cd hw2
+cp ~/cs152/hw2/*.scala src/main/scala # (substitute your git repo root for ~/cs152)
+sbt run
+</pre>
+    <p>You should see the print statements from your <code>hw2test</code> object. The grader will add his own test objects.</p>
+  </body>
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw2/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture4/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 4</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Functions as Parameters</h1> 
+    <ul>
+      <li>Consider the <code>map</code> function: 
+        <pre>val triple = (x : Int) =&gt; 3 * x
+(1 to 10).map(triple)
+// yields 3 6 9 12 ... 30</pre> 
+      </li> 
+    </ul> 
+    <ul>
+      <li>Let's implement such a function. For simplicity, we only use sets and functions of <code>Int</code></li> 
+      <li>Two parameters: <code>List[Int]</code>, function <code>(Int) =&gt; Int</code>, returns <code>List[Int]</code> 
+        <pre>def map(lst : List[Int], <strong>fun</strong>: (Int) =&gt; Int) : List[Int] = </pre> 
+      </li> 
+      <li>Map of empty list is <code>Nil</code>, otherwise apply <code>fun</code> to <code>lst.head</code> and use recursion: 
+        <pre>if (lst.isEmpty) 
+  Nil else
+  <strong>fun</strong>(lst.head) :: map(lst.tail, <strong>fun</strong>)</pre> 
+      </li> 
+      <li>Sample call: 
+        <pre>map(List(1, 2, 3), (x : Int) =&gt; 3 * x)</pre> 
+      </li> 
+      <li>A function describes a piece of behavior, such as 
+        <blockquote>
+          <p>What should <code>map</code> do with each element in <code>lst</code>?</p> 
+        </blockquote> 
+      </li> 
+    </ul> 
+    <h1>Capturing the Enclosing Environment</h1> 
+    <ul>
+      <li>Consider this function: 
+        <pre>val n = 3
+val fun = (x : Int) =&gt; n * x
+// What is fun(2)?</pre> 
+      </li> 
+      <li><code>n</code> is not defined in the scope of <code>fun</code>, but that is ok. In the body of a function, you can use any variable from the enclosing scope.</li> 
+      <li>Doesn't seem a big deal—<code>n</code> is immutable, so it will always be 3. But consider this: 
+        <pre>def multiplyBy(n : Int) = (x : Int) =&gt; n * x</pre> 
+      </li> 
+      <li>Huh? Let's call it: 
+        <pre>val quadruple = multiplyBy(4) // the function (x : Int) =&gt; 4 * x</pre> 
+      </li> 
+      <li>And let's call <em>that</em>: 
+        <pre>quadruple(5) // yields 20</pre> 
+      </li> 
+      <li>Each call to <code>multiplyBy</code> yields a different function.</li> 
+      <li>Each function has a different value of <code>n</code></li> 
+      <li>Closure = function + binding of its free variables (i.e the variables that are not defined locally in the function)</li> 
+    </ul>
+
+    <h1>Parameter Inference From Context</h1> 
+    <ul>
+      <li>When a function parameter type is known, you can supply an anonymous function without specifying its parameter types 
+        <pre>def twice(f: (Int) =&gt; Int, x : Int) = f(f(x))
+twice((x) =&gt; 42 * x, 3) 
+  // Ok, x <strong>: Int</strong> is inferred from context</pre> 
+      </li> 
+      <li>Very useful when calling library functions 
+        <pre> List(1, 2, 3).map((x) =&gt; x * x)</pre> 
+        <ul>
+          <li><code>List[A].map(f : (A) =&gt; B) : List[B] </code></li> 
+          <li><code>A</code> is <code>Int</code> since <code>List(1, 2, 3)</code> is a <code>List[Int]</code></li> 
+          <li><code>f</code> must be <code> (Int)=&gt; . . .</code></li> 
+          <li><code>x</code> must be <code>Int</code></li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Parameter Simplifications</h1> 
+    <ul>
+      <li>Ok to omit <code>()</code> around a single inferred parameter 
+        <pre>List(1, 2, 3).map(<strong>x</strong> =&gt; x * 0.5)
+List(1, 2, 3).sortWith(<strong>(x, y)</strong> =&gt; x &gt; y)
+  // <cite>need <code>()</code> with 2 or more parameters, or with 0 parameters</cite></pre> 
+      </li> 
+      <li>Use <code>_</code> for a parameter that only occurs once in the body 
+        <pre>List(1, 2, 3).map(_ * 0.5)
+List(1, 2, 3).sortWith(_ &gt; _)</pre> 
+      </li>
+      <li>The <code>_</code> can't be in an expression that is passed to another function.
+        <pre>List(1, 2, 3).map(math.sqrt(_ + 1)) // <cite>Error—Can't pass <code>_ + 1</code> to <code>math.sqrt</code>
+List(1, 2, 3).map(math.sqrt(_) + 1) // <cite>Ok</cite>
+</cite>
+
+</pre></li>
+    </ul> 
+    <h1>Reductions</h1>
+    <ul><li><code>map</code> produces a list of values.</li>
+      <li>What if we want a single value?</li>
+      <li>In the previous lecture, we wrote
+        <pre>def sum(List[Int] lst): Int</pre></li>
+      <li>What about product? Max? Min?</li>
+      <li>The combining function should be an argument:
+        <pre>def reduce(lst: List[Int], <b>op: (Int, Int) =&gt; Int</b>): Int
+</pre></li>
+      <li>Call as
+        <pre>val result = reduce(lst, (x, y) =&gt; x + y)</pre></li>
+      <li>Or with anonymous variables:
+        <pre>val result = reduce(lst, _ + _)</pre></li>
+      <li>Implementation:
+        <pre>def reduce(lst: List[Int], op: (Int, Int) =&gt; Int): Int =
+  if (lst.tail.isEmpty) lst.head else
+  op(lst.head, reduce(lst.tail, op)) 
+</pre></li>      
+    </ul>
+
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab3/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Filters</h1> 
+    <ol>
+      <li>What does the following function do? If in doubt, call it with a few values. 
+        <pre>val isEven = (x : Int) =&gt; x % 2 == 0</pre> 
+      </li> 
+      <li>Type <code>(1 to 10).filter(isEven)</code>. As always, don't type the period, but type ENTER. What do you get? </li> 
+      <li>Describe what <code>filter</code> does.</li> 
+    </ol> 
+    <h1>Step 2: A Random Number List</h1> 
+    <ol>
+      <li>The random number generator in Scala is similar to that in Java. What output do you get from 
+        <pre>val gen = new scala.util.Random
+gen.nextInt(10)
+gen.nextInt(10)</pre> 
+      </li> 
+      <li>What is the significance of the 10?</li> 
+      <li>We want to define a function <code>randList(len : Int, n : Int) : List[Int]</code> that makes a list of length <code>len</code> of random integers between 0 and <code>n</code> - 1. For example, <code>randList(5, 10)</code> might yield a list of numbers 5 1 2 0 9. Define <code>randList</code> as a recursive function. What is the code of your function? 
+        <p><em>Hint</em>: If <code>len</code> is 0, the result is <code>nil</code>. Otherwise, it is <code>gen.nextInt(n) ::</code> something. What is your definition? </p> 
+        <p><em>Note</em>: You need <em>not</em> define <code>gen</code>. You already defined it in part 1. Just use it.</p> 
+      </li> 
+      <li>What do you get for <code>randList(5, 1000)</code>? For <code>randList(1000, 5)</code>?</li> 
+      <li>Why is <code>randList</code> a closure? </li> 
+    </ol> 
+    <h1>Step 3: Filtering Large Numbers</h1> 
+    <ol>
+      <li>Write a function <code>greaterThan100(lst : List[Int])</code> that returns only those integers in <code>lst</code> that are greater than 100. Don't use recursion; simply call <code>filter</code> with an appropriate function: 
+        <pre>def greaterThan100(lst : List[Int]) = {
+  val fun = ... // your work 
+  lst.filter(fun) // NOTE: The last expression in a { ... } is its value
+}</pre> 
+        <p>What is your function's code?</p> 
+      </li> 
+      <li>What is the value of <code>greaterThan100(randList(10, 200))</code>? Why does that give you confidence that you implemented everything correctly? </li> 
+      <li>Of course, having a hard-wired bound of 100 is intensely ugly. Let's generalize: 
+        <pre>def greaterThan(n : Int, lst : List[Int]) = {
+  val fun = ... // your work 
+  lst.filter(fun) 
+}</pre> 
+        <p>For example, <code>greaterThan(50, nums)</code> yields all values of <code>nums</code> &gt; 50.</p> 
+        <p>What is the code of your <code>greaterThan</code> function?</p> 
+      </li> 
+      <li>What is the value of <code>greaterThan(100, randList(10, 200))</code>? </li> 
+      <li>Why is the <code>fun</code> inside <code>greaterThan</code> a closure?</li> 
+    </ol> 
+    <h1>Step 4: Reduce</h1>
+    <ol><li>What is <code>reduce(List(1,2,3,4,5), (x, y) =&gt; x - y)</code>?</li>
+      <li>Scala has two forms of <code>reduce</code> called <code>reduceLeft</code> and <code>reduceRight</code>. Try
+        <pre>(1 to 5).reduceLeft(_ - _)
+(1 to 5).reduceRight(_ - _)
+</pre> What do each of them do?</li>
+      <li>Given a list of digits, pick one of the two forms of <code>reduce</code> to compute the decimal value. For example, <code>List(1, 7, 2, 9)</code> should turn into 1729. Hint: <code>(x, y) =&gt; 10 * x + y</code>.</li>
+      <li>We have implemented one of the forms of <code>reduce</code> in the lecture. Which one? Implement the other. Here is an outline:
+        <pre>def otherReduce(lst: List[Int], op: (Int, Int) =&gt; Int) = {
+  def otherReduceHelper(lst: List[Int], op: (Int, Int) =&gt; Int, partialResult: Int): Int =
+    if (lst.isEmpty) ... else
+    otherReduceHelper(..., op, op(..., ...))
+  otherReduceHelper(..., op, ...)
+}</pre></li>      
+    </ol>    
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture4/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+</html>

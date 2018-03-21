@@ -1,0 +1,61 @@
+HTTrack3.49-2+htsswf+htsjava launched on Tue, 20 Mar 2018 20:33:17 at http://horstmann.com/sjsu/spring2018/cs152/ +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar -*[name].youtube.com/*
+(winhttrack -qYr3%e1C2%Pns2u1%s%uN0%I0p3DaK0H0%kf2A25000000000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" -Y http://horstmann.com/sjsu/spring2018/cs152/ -O1 "C:\Users\rooke\Projects\cs152\websiteCopy\Horstmann152WebsiteCopy" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar -*[name].youtube.com/* )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+20:33:17	Warning: 	* security warning: maximum bandwidth limited to 250000 to avoid server overload
+20:33:17	Warning: 	Note: due to horstmann.com remote robots.txt rules, links beginning with these path will be forbidden: /twins/, /vietnam/, /suisse/, /private/, /oodp3/, /codecheck/python-questions.html, /codecheck/bj4fp.html, /codecheck/jfe1cc.html, /codecheck/bj4cc.html, /codecheck/problems.html (see in the options to disable this)
+20:34:01	Warning: 	Note: due to www.sjsu.edu remote robots.txt rules, links beginning with these path will be forbidden: /cgi-bin/, /contact/, /police/crime_reporting/crime_blotter/, /police/docs/blotter/, /atn/, /mae/, /resources/, /computereng/, /provost/budget/flg/docs/, /drc/, /hrtm/, /typeahead.js/, /sjsuhome/assets/js/typeahead/, /ldp/, /gallery-pics/, /*/gallery-pics/, /logout/ (see in the options to disable this)
+20:34:04	Warning: 	Note: due to https://piazza.com remote robots.txt rules, links beginning with these path will be forbidden: /stats/report/ (see in the options to disable this)
+20:34:24	Error: 	"Not Found" (404) at link horstmann.com/sjsu/spring2018/cs152/hw1.html (from horstmann.com/sjsu/spring2018/cs152/)
+20:34:24	Error: 	"Not Found" (404) at link horstmann.com/sjsu/spring2018/cs152/www.sjsu.edu/senate/S12-3.pdf (from horstmann.com/sjsu/spring2018/cs152/)
+20:34:34	Error: 	"Not Found" (404) at link www.sjsu.edu/registrar/tutorials/grade_values.html (from horstmann.com/sjsu/spring2018/cs152/)
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.w3.org/StyleSheets/TR/base.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/jquery.lightbox-0.5.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/nivo-slider-em.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/styles-em.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/fontfix.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/content-enhancements.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/print.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/_resources/css/faculty-profile.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/shared/lib/bootstrap/bootstrap.min.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/dashboard/topbardc41.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/third_party/jquery-ui-bootstrap/css/custom-theme/jquery-ui-1.8.16.custom.css
+20:34:34	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/class_profile/styledc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/resetdc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/plugins/jqModaldc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/plugins/tipsy.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/plugins/fancybox-1.3.4.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/plugins/jquery-ui-1.8.9/jquery-ui-1.8.9.custom.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/dashboard/styledc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/dashboard/appdc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/dashboard/invite212a.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/css/splash/login_onlydc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/modules/top_bar/top_bardc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/piazza.com/modules/text_editor/text_editordc41.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/horstmann.com/Slidy2/styles/slidy.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/horstmann.com/MySlidy/style.css
+20:34:35	Error: 	"Not Found" (404) at link horstmann.com/sjsu/sjsu/images/lab.jpg (from horstmann.com/sjsu/spring2018/cs152/lecture15/)
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/jquery.lightbox-0.5.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/nivo-slider-em.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/styles-em.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/fontfix.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/content-enhancements.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/info.sjsu.edu/info/css/print.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/info.sjsu.edu/info/css/info.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.oracle.com/us/assets/receiver-style-css.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.oracle.com/us/assets/subtabs-css.css
+20:34:35	Warning: 	Warning: store application/octet-stream without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.oracle.com/asset/web/css/ocom-mosaic.css;filename_=UTF-8''ocom-mosaic.css
+20:34:35	Warning: 	Warning: store application/octet-stream without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.oracle.com/asset/web/css/master-mosaic.css;filename_=UTF-8''master-mosaic.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.oracle.com/technetwork/java/javase-2054821.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/scala-ide.org/resources/stylesheets/jquery.tweet.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/scala-ide.org/resources/stylesheets/bootstrap.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/scala-ide.org/resources/stylesheets/base.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/scala-ide.org/resources/stylesheets/doc.css
+20:34:35	Warning: 	Warning: store text/css without scan: C:/Users/rooke/Projects/cs152/websiteCopy/Horstmann152WebsiteCopy/www.sjsu.edu/sjsuhome/assets/css/print.css
+
+HTTrack Website Copier/3.49-2 mirror complete in 1 minutes 18 seconds : 138 links scanned, 127 files written (3513274 bytes overall) [2697693 bytes received at 34585 bytes/sec], 1178032 bytes transferred using HTTP compression in 37 files, ratio 21%, 3.7 requests per connection
+(4 errors, 46 warnings, 0 messages)

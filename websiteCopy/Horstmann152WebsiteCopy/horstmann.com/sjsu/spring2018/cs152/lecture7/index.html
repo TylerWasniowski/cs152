@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture7/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:17 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 7</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Language Translation Process</h1> 
+    <ul>
+      <li>Input: Source code</li> 
+      <li>Lexical Analysis: Group input characters into reserved words, identifiers, constants, operators, comments</li> 
+      <li>Parsing: Build data representation of program, report syntax errors</li> 
+      <li>Code generation: Use data representation to generate, optimize code</li> 
+      <li>Output: Machine or VM code</li> 
+      <li>Interpreter directly executes the parsed program</li> 
+    </ul> 
+    <h1>Lexical Analysis</h1> 
+    <ul>
+      <li>Remove white space</li> 
+      <li>Remove comments</li> 
+      <li>Break input into <em>tokens</em></li> 
+      <li><code><span class='token'>if</span> <span class='token'>(</span> <span class='token'>radix</span> <span class='token'>&gt;=</span> <span class='token'>0.0</span><span class='token'>)</span> <span class='token'>y</span> <span class='token'>=</span> <span class='token'>sqrt</span><span class='token'>(</span><span class='token'>radix</span><span class='token'>)</span></code></li> 
+      <li>Each token has type (reserved word, identifier, constant, operator, etc.) and text</li> 
+      <li>Use regular expressions to define token types (see below)</li> 
+      <li>Process header files (C/C++)</li> 
+    </ul> 
+    <h1>Notes on White Space</h1> 
+    <ul>
+      <li>Free form language: All white space is optional</li> 
+      <li>Line-oriented language: Line endings are significant. Ex.: Fortran</li> 
+      <li>Scala is in the middle: Newline is a token and can be equivalent to a <code>;</code></li> 
+      <li>Python: Indentation indicates block structure 
+        <pre>if radix &gt;= 0:
+    y = sqrt(radix)
+    print(y)
+else:
+    print('error')</pre> 
+      </li> 
+    </ul> 
+    <h1>Parsing</h1> 
+    <ul>
+      <li>Translates stream of tokens into data structure</li> 
+      <li>Parse tree for expression <code>3 + 4 * x</code> 
+        <p></p> 
+        <p><img height='251' width='227' src='exprtree.jpg' alt=''/></p> 
+      </li> 
+      <li>Higher-level features have more complex structure 
+        <p>Ex. function has</p> 
+        <ul>
+          <li>name</li> 
+          <li>return type</li> 
+          <li>list of parameters</li> 
+          <li>body</li> 
+        </ul> 
+        <p>Body has </p> 
+        <ul>
+          <li>list of expressions (Scala)/statements (Java)</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Code Generation</h1> 
+    <ul>
+      <li>Parse tree translated into machine or VM instructions</li> 
+      <li>Example: 
+        <p><img height='251' width='227' src='exprtree.jpg' alt=''/></p> 
+        <pre>movl $4, %eax
+mull x, %eax
+addl $3, %eax</pre> 
+      </li> 
+    </ul> 
+    <h1>Code Optimization</h1> 
+    <ul>
+      <li>Register allocation 
+        <pre>result = (a + b) * (c + d)</pre> 
+        <pre>movl a, %eax
+addl b, %eax
+
+movl c, %<strong>ebx</strong>
+addl b, %ebx
+
+mull %ebx, %eax
+movl %eax, result</pre> 
+      </li> 
+      <li>Loop optimization 
+        <pre>for (i = 0; i &lt; n; i++) {
+   <strong>t = u * v; </strong>   
+   a[i] = t + i;
+}</pre> 
+      </li> 
+      <li>Inline functions 
+        <pre>int max(int x, int y) { return x &gt; y ? x : y; }</pre> 
+        <p>Translate <code>max(x, 0)</code> into <code>x &gt; 0 ? x : 0</code>, avoid cost of function call</p> 
+      </li> 
+      <li>Many others</li> 
+    </ul> 
+    <h1>Regular Expressions</h1> 
+    <ul>
+      <li>Describe “regular” sets of strings</li> 
+      <li>Symbols other than ( ) | * stand for themselves</li> 
+      <li>Concatenation α β: First part matches α, second part β</li> 
+      <li>α | β = Match α or β</li> 
+      <li>α* = 0 or more matches of α</li> 
+      <li>Use () for grouping</li> 
+      <li>Example: E(0|1|2|3|4|5|6|7|8|9)* 
+        <p>An E followed by a (possibly empty) sequence of digits</p> 
+        <pre>E123
+E9
+E</pre> 
+      </li> 
+    </ul> 
+    <h1>Regular Expressions</h1> 
+    <p><img height='403' width='329' src='regex.jpg' alt=''/></p> 
+    <h1>Convenience Notation</h1> 
+    <ul>
+      <li>α+ = one or more (i.e. αα*)</li> 
+      <li>α? = 0 or 1 (i.e. (|α))</li> 
+      <li>[xyz] = x|y|z</li> 
+      <li>[x-y] = all characters from x to y, e.g. [0-9] = all ASCII digits</li> 
+      <li>[^x-y] = all characters other than [x-y]</li> 
+      <li>\p{<em>Name</em>}, where <em>Name</em> is a Unicode category (ex. L, N, Z for letter, number, space)</li> 
+      <li>\P{<em>Name</em>}: complement of \p{<em>Name</em>}</li> 
+      <li><code>.</code> matches any character</li> 
+      <li><code>\</code> is an escape. For example, <code>\.</code> is a period, <code>\\</code> a backslash</li> 
+    </ul> 
+    <h1>Regex Examples</h1> 
+    <ul>
+      <li>Integers: <code>[+-]?[0-9]+</code>, or maybe <code>[+-]?\p{N}+</code> 
+        <ul>
+          <li>Note: + loses its normal meaning inside [], and a - just before ] denotes itself</li> 
+        </ul> 
+      </li> 
+      <li>Hexadecimal numbers <code>0[Xx][0-9A-Fa-f]+</code></li> 
+      <li>Quoted Java strings: <code>".*"</code></li> 
+      <li>Well, actually not; the <code>.</code> will match a quote. Better: <code>"[^"]*"</code></li> 
+      <li>Well, actually not; you can have a <code>\"</code> in a quoted string. <code>"([^"\\]|\\.)*"</code></li> 
+      <li>Are we done yet? What about <code>\x1B</code>?</li> 
+    </ul> 
+    <h1>The Scala Regex Library</h1> 
+    <ul>
+      <li>Find all matches 
+        <pre>import scala.util.matching._
+val regex = "[0-9]+".r
+regex.findAllIn("99 bottles, 98 bottles").toList
+<strong>List[String] = List(99, 98)</strong></pre> 
+        <p>Check whether beginning matches</p> 
+        <pre>regex.findPrefixOf("99 bottles, 98 bottles").getOrElse(null)
+<strong>String = 99</strong></pre> 
+      </li> 
+      <li>Groups 
+        <pre>val regex = "([0-9]+) bottles".r
+val matches = regex.findAllIn("99 bottles, 98 bottles, 97 cans").matchData.toList 
+<strong>matches : List[Regex.Match] = List(99 bottles, 98 bottles)</strong>
+matches.map(_.group(1))
+<strong>List[String] = List(99, 98)</strong></pre> 
+      </li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab6/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Regular Expressions</h1> 
+    <p>Write down regular expressions for</p> 
+    <ul>
+      <li>Java floating-point literals</li> 
+      <li>Java character constants</li> 
+      <li>C-style comments, i.e. <code>/* ... */</code></li> 
+    </ul> 
+    <h1>Step 2: Check Your Regexes</h1> 
+    <p>Use the Scala <code>Regex.findAllIn</code> method to check your work from Step 1 with the strings</p> 
+    <ul>
+      <li>
+        <pre>"3.14 -3.14 +3.14 3. 3 .3 3.14E2 3.14E+2 3.14E-2 3.14e100"</pre> 
+      </li> 
+      <li>
+        <pre>"'a' '\\n' '\\\\' '\\'' '\\x1b' '\\033'"</pre> 
+      </li> 
+      <li>
+        <pre>"/* foo */ /** foo */ /**/**/**/ /*/*/*/"</pre> 
+      </li> 
+    </ul> 
+    <p>What results do you get? </p> 
+    <p>Tip: In Java, it is unpleasant to deal with strings containing backslashes and quotes. For example, the regular expression <code>([^"\\]|\\.)*</code>, as a Java string, is <code>"([^\"\\\\]|\\\\.)*"</code> Scala has an alternate way of specifying strings. When strings are enclosed in <code>"""..."""</code>, nothing inside is escaped. (Of course, you can't have a <code>"""</code> inside.) For example, <code>"""([^"\\]|\\.)*"""</code>.</p> 
+    <h1>Step 3: A Simple Lexer</h1> 
+    <p>In a lexer, we specify a set of patterns that are tried in sequence. For example, a simple language might have the following token types:</p> 
+    <ul>
+      <li>Reserved words: <code>if|def|val</code></li> 
+      <li>Identifiers: <code>\p{L}(\p{L}|\p{N}|_)*</code></li> 
+      <li>Literals: <code>[+-]?\p{N}+</code></li> 
+      <li>Operators: <code> [+*/%&lt;=&gt;-]</code></li> 
+      <li>Syntactical marks: <code>[(){};]</code></li> 
+      <li>White space: <code>\p{Z}+</code></li> 
+    </ul> 
+    <p>Note that the order matters. We want <code>if</code>, <code>def</code>, <code>val</code> recognized as reserved words, not identifiers.</p> 
+    <p>In this step, write a function <code>firstMatch(input : String, patterns : List[Regex])</code><code>: String</code> that returns the first match in the input string for any of the regular expressions or <code>null</code> if there is no match. For example,</p> 
+    <pre>val patterns = List("if|def|val".r, """\p{L}(\p{L}|\p{N}|_)*""".r,
+   """[+-]?\p{N}+""".r, "[+*/%&lt;=&gt;-]".r, "[(){};]".r, """\p{Z}+""".r
+)
+val input = "if(x&lt;0) 0 else root(x);"
+firstMatch(input, patterns)
+<strong>String : if</strong>
+firstMatch(input.substring(2), patterns)
+<strong>String : (<!-- ) --></strong></pre> 
+    <p>What is the code for your function?</p> 
+    <p>Hint: This is simple recursion. If the first regex matches, return the match, otherwise call <code>firstMatch(input, patterns.tail</code>).</p> 
+    <h1>Step 4: Complete the Lexer</h1> 
+  <p>Write a function <code>tokens(input : String, patterns : List[Regex]) : List[String]</code> that returns a list of matching tokens. For example,</p> 
+    <pre>tokens(input, patterns)
+<strong>List[String] = List(if, (, x, &lt;, 0, ), , 0, , else, , root, (, x, ), ;, )</strong></pre> 
+    <p>That's again simple recursion. If the input is empty, return the empty list. Otherwise, get the first match. If it's null, return the empty list. Otherwise, recursively call <code>tokens(input.substring(first.length), patterns)</code>.</p> 
+    <p>What is the code of your function? </p> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture7/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:17 GMT -->
+</html>

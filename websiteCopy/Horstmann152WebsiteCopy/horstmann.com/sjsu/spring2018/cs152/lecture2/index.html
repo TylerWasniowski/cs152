@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture2/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 2</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Functional Programming</h1> 
+    <ul>
+      <li>Functional programming: Functions are values</li> 
+      <li>In Java, values are 
+        <ul>
+          <li>Primitive types <code>int</code>, <code>double</code>, etc.</li> 
+          <li>References to objects or arrays</li> 
+        </ul> 
+      </li> 
+      <li>A method is not a “first class” value in Java
+        <ul><li>Cannot declare a variable that holds a method</li>
+          <li>Cannot create new method in a running program</li> 
+        </ul> 
+      </li> 
+      <li>In a functional programming language, functions are first-class values 
+        <ul>
+          <li>Can have variables that hold functions</li> 
+          <li>Can create new functions</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Functional Programming in Scala</h1> 
+    <ul>
+      <li>Functions can be values 
+        <pre>val num = 3.14
+val fun = math.ceil _
+fun(num) // prints 4</pre> 
+      </li> 
+      <li>Functions can be anonymous... 
+        <pre>(x : Int) =&gt; x * x</pre> 
+      </li> 
+      <li>...just like numbers 
+        <pre>3.14</pre> 
+      </li> 
+      <li>Of course, can put function values into variables and then use them 
+        <pre>val square = <strong>(x : Int) =&gt; x * x</strong>
+square(10) // prints 100</pre> 
+      </li> 
+      <li>...again, just like numbers 
+        <pre>val pi = 3.14
+pi * 10 // prints 31.4</pre> 
+      </li> 
+    </ul> 
+    <h1>Why Functional Programming?</h1> 
+    <ul>
+      <li>Simpler and clearer programming style</li> 
+      <li>Often useful to pass functions as parameters 
+        <pre>val numbers = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+numbers.map(<strong>(x : Int) =&gt; x * x</strong>)
+   // <cite>Yields a new <code>List(1, 4, 9, 16, 25, 36, 49, 64, 81, 100)</code></cite></pre>
+      </li> 
+      <li>How would you write a generic <code>map</code> function in Java that does the same?</li>
+      <li>You can pass behavior as an interface:
+        <pre>public static &lt;T&gt; List&lt;R&gt; map(List&lt;T&gt; values, Transformer&lt;T, R&gt; f)</pre></li>
+      <li>Java 8 lambdas provide syntactic sugar, but they are not true functions.</li>
+      <li>Functions have been with us for hundreds of years of mathematics.</li>
+      <li>Making them “first class citizens” in a programming language provides expressive power.</li>
+    </ul> 
+    <h1>Scala Basics</h1> 
+    <ul>
+      <li>Types <code>Int</code>, <code>Double</code>, <code>Boolean</code>, <code>String</code></li> 
+      <li>Arithmetic like in Java: <code>+ - * / %</code></li> 
+      <li>Variable type is inferred: 
+        <pre>val luckyNumber = 13 // luckyNumber is an <strong>Int</strong></pre> 
+      </li> 
+      <li>Function types: 
+        <pre>val square = (x : Int) =&gt; x * x // square is an <strong>Int =&gt; Int</strong></pre> 
+      </li> 
+      <li>Semicolons at the end of a line are optional 
+        <pre>val x = 1
+val y = 2 + // <cite>end line with operator to indicate that there is more to come</cite>
+3</pre> 
+      </li> 
+      <li>Everything is an object 
+        <pre>42.<strong>toHexString</strong> 
+      </pre> 
+      </li>
+      <li>Methods without parameters don't require <code>()</code></li>
+    </ul>
+    <h1>Immutability</h1> 
+    <ul>
+      <li>Immutable: Cannot change</li> 
+      <li>In Java, strings are immutable 
+        <ul>
+          <li><code>"Hello".toUpper</code> doesn't change <code>"Hello"</code> but returns a new string <code>"HELLO"</code></li> 
+        </ul> 
+      </li> 
+      <li>In Scala, <code>val</code> are immutable 
+        <pre>val num = 3.14
+num = 1.42 // Error</pre> 
+      </li> 
+      <li>Pure functional programming: No mutations</li>
+      <li>If you call a function twice with the same inputs, you know you'll get the same result</li>
+      <li>Functions that don't mutate state are inherently parallelizable</li> 
+      <li>Important consideration in light of the end of <a href='http://www.intel.com/technology/mooreslaw/index.htm'>Moore's Law</a></li> 
+    </ul>
+    <h1>If/Else</h1> 
+    <ul>
+      <li>
+        <pre>if (<em>booleanExpression</em>) <em>expression1</em> else <em>expression2</em></pre> 
+      </li> 
+      <li>if/else is an <em>expression</em>, not a statement. Can be used in other expressions: 
+        <pre>val x = (<strong>if (true) 2 else 4</strong>) * 3</pre> 
+      </li> 
+      <li>Like <code>? :</code> in Java</li> 
+      <li>Type is the most specific supertype common to <em>expression1</em>, <em>expression2</em> 
+        <pre>val x = if (true) 3 else "Hello" // type is AnyVal</pre> 
+      </li> 
+      <li>Omitting the <code>else</code> yields type <code>Unit</code> (like <code>void</code> in Java); not useful in functional programming</li> 
+    </ul> 
+    <h1>Recursion</h1> 
+    <ul>
+      <li><code>def</code> syntax for functions 
+        <pre>def triple(x : Int) = 3 * x
+// same as val triple = (x : Int) =&gt; 3 * x</pre> 
+      </li> 
+      <li>With recursive functions, also need to specify return type: 
+        <pre>def fac(x : Int) <strong>: Int</strong> = if (x == 0) 1 else x * fac(x - 1)</pre> 
+      </li> 
+      <li>Need <code>def</code> because the name is used on the right 
+        <pre>val fac = (x : Int) =&gt; if (x == 0) 1 else x * <strong>fac</strong>(x - 1) // fac not defined yet</pre> 
+      </li> 
+      <li>Iteration (<code>while</code>, <code>for</code>) can always be expressed as recursion 
+        <blockquote>
+          <p><a href='https://www.phrases.org.uk/meanings/to-err-is-human.html'>To iterate is human; to recurse, divine</a> (<a href='http://www.codersatwork.com/l-peter-deutsch.html'>L. Peter Deutsch</a>)</p> 
+        </blockquote> 
+      </li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>Format of classes: approx. 20 minutes lecture, 45 minutes lab, 10 minute wrap-up </li> 
+      <li>You work with a buddy </li> 
+      <li>One of you (the coder) writes the code, the other (the scribe) types up answers</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch coder/scribe roles each lab</li> 
+      <li>The scribe submits lab work in <code>lab1/report.txt</code> inside the Git repo. Include the coder's name in the report!</li>
+            <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: The Scala Interpreter</h1> 
+    <ol>
+      <li>Start Eclipse and make a new Scala project: File -&gt; New -&gt; Project -&gt; Scala Project. Give a name <code>lab1</code> and click Finish. Right-click on the project in the Package Explorer, then select New -&gt; Scala worksheet. Call it <code>sheet1</code>.</li> 
+      <li>Type <code>39+3</code> and save the worksheet. What do you get?</li> 
+      <li>Type <code>val a = 39 + 3</code>. What do you get?</li> 
+      <li>Type <code>a + 1</code>. What do you get? </li> 
+      <li>Type <code>a = 9</code>. What do you get? Why?</li> 
+      <li>Type <code>val b;</code> (This time with a semicolon.) What do you get? Why?</li> 
+    </ol> 
+    <h1>Step 2: Functions are Values</h1> 
+    <ol>
+      <li>Type <code>val triple = (x : Int) =&gt; 3 * x</code>. What do you get? </li> 
+      <li>Type <code>triple(5)</code>. What do you get? 
+        <blockquote>
+          <p><strong>HINT:</strong> These “What do you get” exercises are a lot more effective when you and your buddy first discuss what you think you'll get. <em>“Form a hypothesis</em>” is an essential part of the learning path.</p> 
+        </blockquote> 
+      </li> 
+      <li>Type <code>triple</code>. What do you get?</li> 
+      <li>What is the type of <code>triple</code> in Scala?</li> 
+      <li>What is the type of <code>5</code> in Scala?</li> 
+    </ol> 
+    <h1>Step 3: Functions as Parameters</h1> 
+    <ol>
+      <li>Type <code>List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)</code>. What do you get?</li> 
+      <li>Type <code>List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).map(triple)</code>. What do you get? Why? </li> 
+      <li>How do you get the <em>cubes</em> of the numbers from 1 to 10 <em>without using </em><code>val</code> or <code>def</code>? Hint: Anonymous function.</li> 
+    </ol>
+    <h1>Step 4: Simple Recursion</h1>
+    <ol><li>Your task is to write a function <code>sevens(n: Int): Int</code> that counts how many digits of <code>n</code> are the digit 7. For example, <code>sevens(747)</code> returns 2. How would you do this in Java (without converting the number to a string)?</li>
+      <li>In functional programming, you can't increment a counter. But you can use recursion. How can you compute the answer recursively? Hint: If <code>n</code> is 0, you know the answer. Otherwise, in plain English or pseudocode, how can you compute the answer from <code>n % 10</code> and <code>sevens(n / 10)</code>?</li>
+      <li>What's your code in Scala?</li>
+    </ol>
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture2/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+</html>

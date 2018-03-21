@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture10/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:19 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 10</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Reminder: Context-Free Grammar</h1> 
+    <ul>
+      <li>Productions 
+        <pre>expr ::= term (( "+" | "-" ) expr)?
+term ::= factor (( "*" | "/") term)?
+factor ::= wholeNumber | "(" expr ")"</pre> 
+      </li> 
+      <li>Non-terminals <code>expr term factor</code></li> 
+      <li>Terminals (tokens) <code>wholeNumber</code> <code>" ("</code> <code>"+"</code> ...</li> 
+      <li>Parse tree shows derivation process 
+        <p><img src='parsetree.png' alt=''/></p> 
+        <p><em>Not the same as an expression tree!</em></p> 
+      </li> 
+    </ul> 
+    <h1>Reminder: Scala Combinator Parser</h1> 
+    <ul>
+      <li>Each nonterminal becomes a function</li> 
+      <li>Terminals (strings) and nonterminals (functions) are combined with operators 
+        <ul>
+          <li>Sequence <code>~</code>, returns instance of class <code>~</code> (similar to a pair)</li> 
+          <li>Alternative <code>|</code></li> 
+          <li>0 or more <code>rep(P)</code>, returns <code>List</code> of the results of P</li> 
+          <li>0 or 1 <code>opt(P)</code>, returns <code>Option</code>: <code>Some</code> of the result of <code>P</code>, or None</li> 
+        </ul> 
+        <pre>class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Any] = term ~ opt(("+" | "-") ~ expr)
+  def term: Parser[Any] = factor ~ opt(("*" | "/" ) ~ term)
+  def factor: Parser[Any] = wholeNumber | "(" ~ expr ~ ")"
+}</pre> 
+      </li> 
+    </ul> 
+    <h1>Transforming Combinator Parser Results</h1> 
+    <ul>
+      <li>Default combinator parser result is inconvenient 
+        <pre>((3~None)~Some((-~((4~Some((*~(5~None))))~None))))</pre> 
+      </li> 
+      <li>Use <code>^^</code> operator to transform. For example, 
+        <pre>wholeNumber ^^ (_.toInt) </pre> 
+      </li> 
+      <li>Use pattern matching for transforms 
+        <pre>def expr: Parser[Int] = (term ~ opt(("+" | "-") ~ expr)) ^^ { 
+    case a ~ None =&gt; a
+    case a ~ Some("+" ~ b) =&gt; a + b
+    case a ~ Some("-" ~ b) =&gt; a - b
+  }</pre> 
+      </li> 
+      <li>Use <code>~&gt;</code>, <code>&lt;~</code> to discard tokens 
+        <pre>def factor: Parser[Int] = wholeNumber ^^ (_.toInt) |
+   <strong>"(" ~&gt; expr &lt;~ ")"</strong></pre> 
+      </li> 
+      <li>The <code>Parser[...]</code> type must match the return type of the transforms (here, <code>Int</code>)</li> 
+    </ul> 
+    <h1>Returning Expression Trees</h1> 
+    <ul>
+      <li>Returning <code>Int</code> works if we interpret an arithmetic expression without variables</li> 
+      <li>If we have variables in a loop, need to evaluate multiple times</li> 
+      <li>Want an expression tree: <code>Parser[Expr]</code> 
+        <pre>class Expr
+case class Number(value : Int) extends Expr
+case class Variable(name : String) extends Expr
+case class Operator(left : Expr, right : Expr, 
+  f: (Int, Int) =&gt; Int) extends Expr</pre> 
+      </li> 
+      <li>
+        <pre>class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Expr] = (term ~ opt(("+" | "-") ~ expr)) ^^ { 
+    case a ~ None =&gt; a
+    case a ~ Some("+" ~ b) =&gt; <strong>Operator(a, b, _ + _)</strong>
+    case a ~ Some("-" ~ b) =&gt; Operator(a, b, _ - _)
+  } 
+  ...
+}</pre> 
+      </li> 
+      <li>Returns tree such as 
+        <pre>Operator(Number(3),Operator(Number(4),Number(5),&lt;function&gt;),&lt;function&gt;)</pre> 
+      </li> 
+    </ul> 
+    <h1>A Grammar Problem</h1> 
+    <ul>
+      <li>Consider the input <code>3 - 4 - 5</code></li> 
+      <li>Parse: 
+        <pre>expr ::= term - <strong>expr</strong>
+  ::= term - <strong>term - expr</strong>
+    </pre> 
+      </li> 
+      <li>Resulting expression tree: 
+        <p><img height='251' width='227' src='exprtree3.png' alt=''/></p> 
+      </li> 
+    </ul> 
+    <ul>
+      <li>That's the wrong tree. 3 - (4 - 5) is 3 - (-1) = 4</li> 
+      <li>We want - to be left associative: (3 - 4) - 5</li> 
+      <li>How about switching <code>expr</code> and <code>term</code>?</li> 
+      <li>In theory, this works, but in practice, the Scala combinator parser gets into an infinite recursion 
+        <pre>expr ::= expr - term 
+ ::= expr - expr - term
+ :: expr - expr - expr - term</pre> 
+      </li> 
+    </ul> 
+    <h1>Remedy: Manually Group Terms</h1> 
+    <ul>
+      <li>Reorganize Grammar 
+        <pre>class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Expr] = term ~ rep(("+" | "-") ~ term)
+  def term: Parser[Expr] = factor ~ rep(("*" | "/" ) ~ factor)
+  def factor: Parser[Expr] = wholeNumber | "(" ~ expr ~ ")"</pre> 
+      </li> 
+    </ul> 
+    <ul>
+      <li>Now we have a list of <em>all</em> terms</li> 
+      <li>Manually group them left to right 
+        <pre>Operator(Operator(...(Operator(term1, term2, op1), term3, op2), ...)</pre> 
+      </li> 
+      <li>Reminder: <code>foldLeft</code> or the <code>/:</code> operator 
+        <pre>def sum(lst: List[Int]) = (0 /: lst) ((x, y) =&gt; x + y)</pre> 
+      </li> 
+      <li>The <code>/:</code> indicates the tree shape 
+        <pre>  a+b+c
+     / \
+  a+b   c
+   / \
+  a   b
+ / \
+0   a</pre> 
+      </li> 
+    </ul> 
+    <h1>Use foldLeft</h1> 
+    <ul>
+      <li>Parsing 3 - 4 - 5 yields 
+        <pre>3 ~ List("-" ~ 4, "-" ~ 5)</pre> 
+      </li> 
+      <li>Note that the tail is a flat list</li> 
+      <li>Want the tree 
+        <pre>   -6
+   / \
+ -1  "-" ~ 5
+ / \
+3  "-" ~4</pre> 
+      </li> 
+      <li>Initial element is 3</li> 
+      <li>Next element is <code>"-" ~ 4</code></li> 
+      <li>Fold operator is 
+        <pre>case (x, "+" ~ y) =&gt; Operator(x, y, _ + _)
+case (x, "-" ~ y) =&gt; Operator(x, y, _ - _)</pre> 
+      </li> 
+      <li>Now everything together: 
+        <pre>def expr: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ { 
+    case a ~ lst =&gt;  (a /: lst) { 
+      case (x, "+" ~ y) =&gt; Operator(x, y, _ + _)
+      case (x, "-" ~ y) =&gt; Operator(x, y, _ - _)
+    }</pre> 
+      </li> 
+    </ul> 
+    <ul>
+      <li>Result: Parser yields <code>Expr</code> with the correct structure</li> 
+      <li>Next lecture: What can we do with the tree?</li> 
+    </ul> 
+    <p></p> 
+    <p></p> 
+    <p></p> 
+    <p></p> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab9/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1</h1> 
+    <p>Complete the program from slides 3 and 4. </p> 
+    <pre>import java.io._
+import scala.util.parsing.combinator._
+
+class SimpleLanguageParser1 extends JavaTokenParsers {    
+  def expr: Parser[Int] = (term ~ opt(("+" | "-") ~ expr)) ^^ { 
+    case a ~ None =&gt; a
+    case a ~ Some("+" ~ b) =&gt; a + b
+    case a ~ Some("-" ~ b) =&gt; a - b
+    } 
+  . . .
+  def factor: Parser[Int] = wholeNumber ^^ (_.toInt) | "(" ~&gt; expr &lt;~ ")"
+}
+
+object Main extends App {
+  val parser = new SimpleLanguageParser1
+  val result = parser.parse(parser.expr, new InputStreamReader(System.in))
+  println(result)       
+}</pre> 
+    <ol>
+      <li>How did you complete the parser?</li> 
+      <li>What result do you get when you input 3 + 4 * 5? </li> 
+      <li>On your platform, how did you have to indicate the end of console input? (I had to type Ctrl+D in Linux.)</li> 
+      <li>Why isn't the output a tree?</li> 
+    </ol> 
+    <h1>Step 2</h1> 
+    <p>Complete the program from Slide 5.</p> 
+    <pre>import java.io._
+import scala.util.parsing.combinator._
+
+class Expr
+case class Number(value : Int) extends Expr
+case class Variable(name : String) extends Expr
+case class Operator(left : Expr, right : Expr, 
+  f: (Int, Int) =&gt; Int) extends Expr
+
+class SimpleLanguageParser2 extends JavaTokenParsers {    
+  def expr: Parser[Expr] = (term ~ opt(("+" | "-") ~ expr)) ^^ { 
+    case a ~ None =&gt; a
+    case a ~ Some("+" ~ b) =&gt; Operator(a, b, _ + _)
+    case a ~ Some("-" ~ b) =&gt; Operator(a, b, _ - _)
+    } 
+  ...
+}
+
+object Main {
+  def main(args : Array[String]) : Unit = {}
+  val parser = new SimpleLanguageParser
+  val result = parser.parse(parser.expr, new InputStreamReader(System.in))
+  println(result)       
+}</pre> 
+    <p>NOTE: Unfortunately, <code>(Number(_.toInt))</code> doesn't work. Use <code>(x =&gt; Number(x.toInt))</code></p> 
+    <ol>
+      <li>How did you complete the code?</li> 
+      <li>What did you get when you parsed 3 + 4 * 5?</li> 
+      <li>What did you get when you parsed 3 - 4 - 5?</li> 
+      <li>What happens when you flip <code>expr</code> and <code>term</code> in the right hand side of the first production? Try parsing 3 - 4 - 5 again.</li> 
+    </ol> 
+    <h1>Step 3</h1> 
+    <p>Complete the program from slide 8:</p> 
+    <pre>import java.io._
+import scala.util.parsing.combinator._
+
+class Expr
+...
+
+class SimpleLanguageParser3 extends JavaTokenParsers {    
+  def expr: Parser[Expr] = (term ~ rep(("+" | "-") ~ term)) ^^ { 
+      case a ~ lst =&gt;  (a /: lst) { 
+        case (x, "+" ~ y) =&gt; Operator(x, y, _ + _)
+        case (x, "-" ~ y) =&gt; Operator(x, y, _ - _)
+      }
+    } 
+  ...
+}
+
+object Main extends App {
+   ...
+}</pre> 
+    <ol>
+      <li>How did you complete the program?</li> 
+      <li>What did you get when you parsed <code>3 - 4 - 5</code>? </li> 
+      <li>We never did anything about <code>Variable</code>. How can you enhance your program to parse them as well, e.g. <code>3 - 4 * x</code>?</li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture10/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:19 GMT -->
+</html>

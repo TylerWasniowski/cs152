@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture14/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 14</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Scheme Features</h1> 
+    <ul>
+      <li>Parentheses syntax: <em>Everything</em> is a list <code>(op arg1 arg2...)</code> 
+        <pre>(+ 3 4)  ; 3 + 4
+(+ 3 4 7 10)  ; 3 + 4 + 7 + 10
+(* 3 (+ 4 5))  ; 3 * (4 + 5)
+(if #t 3 4)  ; 3—#t is true
+(define (fac x) (if (&lt;= x 1) 1 (* x (fac (- x 1)))))
+(fac 10)  ; 3628800
+'(1 2 3)  ; <cite>The list <code>(1 2 3)</code>—we don't want to execute <code>1</code></cite></pre> 
+      </li> 
+      <li>Dynamically typed 
+        <pre>(define x  1)
+(set! x '(1 2 3))  ; x can hold an int or a list</pre> 
+      </li> 
+      <li>Functional 
+        <pre>(map <strong>(λ (x) (* x x))</strong> '(1 2 3))  ; (1 4 9)</pre> 
+      </li> 
+    </ul> 
+    <h1>Control Flow</h1> 
+    <ul>
+      <li><code>(if <var>cond expr1 expr2</var>)</code></li> 
+      <li><code>(and <var>expr1 expr2</var> ...)</code>, <code>(or <var>expr1 expr2</var> ...)</code> </li> 
+      <li><code>(cond (<var>cond1 expr1</var>)<var></var>(<var>cond2 expr2</var>)...(else <var>expr</var>))</code> 
+        <ul>
+          <li>The <code>else</code> is optional</li> 
+          <li>If you like, use <code>[ ]</code> for the length 2 lists 
+            <pre>(cond [(&lt; x 0) -1]  [(= x 0) 0] [else 1])</pre> 
+          </li> 
+        </ul> 
+      </li> 
+      <li><code>(let ([<var>var1 expr1</var>] <var></var>[<var>var2 expr2</var>]...)</code> 
+        <p><code><var>expr1 expr2 <em>...</em> expr<sub>n</sub></var>)</code></p> 
+        <ul>
+          <li>Defines local variables</li> 
+          <li>Evaluates all expressions (for side effects)</li> 
+          <li>Yields value of last expression</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Anonymous Functions</h1> 
+    <ul>
+      <li><code>(λ (args) expr)</code> 
+        <pre>(λ (x y) (* 0.5 (+ x y)))</pre> 
+      </li> 
+      <li>If your keyboard doesn't have a λ key, use <code>lambda</code> instead, or try Ctrl+\ in the Racket environment.
+        <ul>
+          <li>In Linux, add this to your ~/.XCompose; see <a href='https://help.ubuntu.com/community/ComposeKey'>here</a> for background . 
+            <pre>&lt;Multi_key&gt; &lt;g&gt; &lt;l&gt;        : "λ"   </pre> 
+          </li> 
+        </ul> 
+      </li> 
+      <li>Like 
+        <pre>{ | x y | 0.5 * (x + y) }  # Ruby
+{ (x: Double, y: Double) =&gt; 0.5 * (x + y) }  // Scala
+function(x, y) { return 0.5 * (x + y) }  // JavaScript</pre> 
+      </li> 
+      <li>Useful for passing to higher-order functions 
+        <pre>(map <strong>(λ (x) (* x x))</strong> '(1 2 3))  ; (1 4 9)</pre> 
+      </li> 
+    </ul> 
+    <h1>Definitions</h1> 
+    <ul>
+      <li><code>(define <var>var expr</var>)</code></li> 
+      <li><code>(define (<var>fun arg1 arg2</var> ...) <var>expr</var>)</code> 
+        <pre>(define x 1)
+(define (square x) (* x x))</pre> 
+      </li> 
+      <li>Added to current scope</li> 
+      <li>Can use <code>let</code> instead 
+        <pre>(let ((x 1)
+      (square (λ (x) (* x x))))
+    <cite>Rest of program using <code>x</code> and <code>square</code></cite>)</pre> 
+        <p>Actually, not quite—need a different form of <code>let</code> for recursive functions</p> 
+      </li> 
+    </ul> 
+    <h1>Lists</h1> 
+    <ul>
+      <li>Three primitives: <code>first</code>, <code>rest</code>, <code>cons</code></li> 
+      <li>A list is either <code>empty</code> or has a head and tail 
+        <pre>(define lst '(1 4 9))
+(first lst) ; 1
+(rest lst) ; '(4 9)
+(rest (rest (rest lst))) ; '()<cite>or </cite>empty</pre> 
+      </li> 
+      <li>Use <code>cons</code> to build lists 
+        <pre>(cons 0 lst)  ; '(0 1 4 9)
+(cons 0 (cons 1 (cons 4 (cons 9 empty))))  ; <cite>the same list</cite></pre> 
+      </li> 
+    </ul> 
+    <h1>List Functions</h1> 
+    <ul>
+      <li>Use recursion for list functions 
+        <pre>(define (sum lst)
+  (if (empty? lst) 
+    0 
+    (+ (first lst) (sum (rest lst)))))</pre> 
+      </li> 
+      <li>Use <code>cons</code> to recursively build lists 
+        <pre>(define (squares n)
+  (if (= n 0) 
+    empty
+    (cons (* n n) (squares (- n 1)))))</pre> 
+      </li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <h1>Step 1</h1> 
+    <ol class='lower-alpha'>
+      <li>Install Racket from <a href='http://racket-lang.org/'>http://racket-lang.org</a>. (Racket is a Scheme dialect with a pretty nice environment.)</li> 
+      <li>Start the interactive Dr. Racket console by launching <code>drracket</code> or <code>drracket.exe</code>.</li> 
+      <li>Work through steps 2 and 3 of <a href='http://docs.racket-lang.org/quick/index.html'>http://docs.racket-lang.org/quick/index.html</a> (which is also inside the <code>doc/quick</code> directory of your Racket installation)</li> 
+      <li>As instructed, try the F1 key. How do you get the circle and square aligned at the top?</li> 
+    </ol> 
+    <h1>Step 2</h1> 
+    <ol class='lower-alpha'>
+      <li>Implement a function <code>circles</code> so that <code>(circles n)</code> draws a row of n circles, like this: oooooooooo 
+        <p>Hint: <code>(hc-append</code> <code>(circle 10) (circles ...))</code></p> 
+      </li> 
+      <li>Work through step 5 of the tutorial. 
+        <p>How can you tell that the nested <code>define</code> binding in the first part of step 5 is really local?</p> 
+      </li> 
+      <li>What happens when you use <code>let</code> instead of <code>let*</code> in the last part of step 5? Why?</li> 
+    </ol> 
+    <h1>Step 3</h1> 
+    <ol class='lower-alpha'>
+      <li>Work through step 6 of the tutorial. Then improve on the <code>series</code> function so that it can make a series of arbitrary sizes, i.e. 
+        <pre>(series circle '(5 10 20))</pre> 
+        <p>has the same effect as the original version, but we can also do</p> 
+        <pre>(series circle '(5 10 20 10 5))</pre> 
+        <p>What is the code of your function?</p> 
+      </li> 
+      <li>Work through step 7. The text makes a big deal out of the fact that the λ expression is “lexically scoped”. What term do we normally use to describe such a function?</li> 
+      <li>Work through step 8. Look at the nifty list that you get from <code>(rainbow (square 5))</code>. Look carefully—it's a quoted <em>list</em> of shapes, not a painted shape. How do you change <code>series</code> so that you get a list of shapes instead of a combined shape?</li> 
+      <li>Having a list is so much more useful. You can now make a vertical drawing of them, with one line of code. How?</li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture14/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+</html>

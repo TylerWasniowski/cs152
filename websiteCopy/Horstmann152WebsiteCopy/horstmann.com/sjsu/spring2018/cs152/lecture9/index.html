@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture9/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:18 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 9</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Context-Free Grammar</h1> 
+    <ul>
+      <li>Language: Set of valid token sequences</li> 
+      <li>Terminal symbol: Token in the language. Ex: <code>" class"</code> <code>"3.14"</code> <code>"+"</code> </li> 
+      <li>Nonterminal symbol: Symbols in the grammar. Ex. <code>expression</code></li> 
+      <li>Production: Rule for replacing a nonterminal by a sequence of nonterminals and terminals 
+        <pre>term ::= factor "*" term</pre> 
+      </li> 
+      <li>Can have more than one production for the same nonterminal 
+        <pre>term ::= factor</pre> 
+      </li> 
+      <li>Derivation: Sequence of productions 
+        <pre>term ::= factor "*" <strong>term</strong>
+  ::= factor "*" factor "*" <strong>term</strong>
+  ::= factor "*" factor "*" factor</pre> 
+      </li> 
+      <li>Context-free: The replacement doesn't depend on the context of the nonterminal</li> 
+    </ul> 
+    <h1>Parse Tree</h1> 
+    <ul>
+      <li>Shows derivation process 
+        <p><img src='parsetree.png' alt=''/></p> 
+      </li> 
+      <li><em>Not the same as an expression tree!</em></li> 
+      <li>Parser: Component that follows derivation process, yielding some actions</li> 
+      <li>Most common actions: Building an expression tree. (Next lecture)</li> 
+    </ul> 
+    <h1>Grammar Example: List of Numbers</h1> 
+    <ul>
+      <li>Want to generate 
+        <pre>(1)
+(1, 24, 4)
+()</pre> 
+      </li> 
+      <li>
+        <pre>list ::= "(" contents ")"</pre> 
+      </li> 
+      <li>
+        <pre>contents ::=
+contents ::= number
+contents ::= number "," contents</pre> 
+      </li> 
+      <li>No, that's wrong. We could derive <code>(1, 24, )</code></li> 
+    </ul> 
+    <h1>Grammar Example: List of Numbers</h1> 
+    <ul>
+      <li>Try again</li> 
+      <li>
+        <pre>list ::= "(" contents ")"
+list ::= "(" ")"</pre> 
+      </li> 
+      <li>
+        <pre>contents ::= number
+contents ::= number "," contents</pre> 
+      </li> 
+      <li>Easy to see by induction that <code>contents</code> yields <em>n</em> numbers separated by <em>n</em> - 1<em></em> commas</li> 
+    </ul> 
+    <h1>Extended BNF</h1> 
+    <ul>
+      <li>Backus-Naur form: Original syntax for grammar rules in Algol-60</li> 
+      <li>Extended by conveniences for frequently recurring constructs</li> 
+      <li>Alternatives <code>A | B</code></li> 
+      <li>Repetitions 
+        <ul>
+          <li>0 or more <code>(A)*</code> or <code>{A}</code></li> 
+          <li>1 or more <code>(A)+</code></li> 
+          <li>0 or 1 <code>(A)?</code> or <code>[A]</code></li> 
+        </ul> 
+      </li> 
+      <li>For example, 
+        <pre>list ::= "(" ( number ( "," number )* )? ")"</pre> 
+      </li> 
+    </ul> 
+    <h1>Parser Generators</h1> 
+    <ul>
+      <li>Parser generator: Produces a parser from a given grammar</li> 
+      <li>Works in conjunction with lexical analyzer</li> 
+      <li>Examples: yacc, Antlr, JavaCC</li> 
+      <li>Programmer specifies actions to be taken during parsing</li> 
+      <li>Far better than writing a parser by hand</li> 
+      <li>No free lunch: need to know parsing theory to build efficient parsers</li> 
+      <li>Scala has a built-in “combinator parser”</li> 
+    </ul> 
+    <h1>Combinator Parser</h1> 
+    <ul>
+      <li>Each nonterminal becomes a function</li> 
+      <li>Terminals (strings) and nonterminals (functions) are combined with operators 
+        <ul>
+          <li>Sequence <code>~</code></li> 
+          <li>Alternative <code>|</code></li> 
+          <li>0 or more <code>rep(...)</code></li> 
+          <li>0 or 1 <code>opt(...)</code></li> 
+        </ul> 
+        <pre>class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Any] = term ~ opt(("+" | "-") ~ expr)
+  def term: Parser[Any] = factor ~ opt(("*" | "/" ) ~ term)
+  def factor: Parser[Any] = wholeNumber | "(" ~ expr ~ ")"
+}</pre> 
+      </li> 
+      <li>Will replace <code>Parser[Any]</code> with something more useful later</li> 
+    </ul> 
+    <h1>Combinator Parser Result</h1> 
+    <ul>
+      <li>String returns itself</li> 
+      <li><code>opt(P)</code> returns <code>Option</code>: <code>Some</code> of the result of <code>P</code>, or <code>None</code> (see next slide)</li> 
+      <li><code>rep(P)</code> returns <code>List</code> of the results of <code>P</code></li> 
+      <li><code>P ~ Q</code> returns instance of class <code>~</code> (similar to a pair)</li> 
+      <li>For example, 
+        <pre>val parser = new SimpleLanguageParser
+val result = parser.parse(parser.expr, "3 - 4 * 5")</pre> 
+        <p>sets <code>result</code> to </p> 
+        <pre>((3~None)~Some((-~((4~Some((*~(5~None))))~None))))</pre> 
+      </li> 
+      <li>We'll transform this to something more useful in the next lecture</li> 
+      <li>After changing <code>(x~None)</code> to <code>x</code>, <code>Some(y)</code> to <code>y</code>, and <code>~</code> to spaces: 
+        <pre>(3 (- (4 (* 5))))</pre> 
+      </li> 
+    </ul> 
+    <h1>The Option Type</h1> 
+    <ul>
+      <li>Option type expresses “0 or 1” relationship</li> 
+      <li>Case class with two cases: <code>Some</code>, <code>None</code></li> 
+      <li>Example: <code>List.find</code> returns <code>Option[A]</code>. 
+        <pre>val result = lst.find(_ % 2 == 0)
+result match { 
+  case Some(x) =&gt; println(x)
+  case None =&gt; println("No match") 
+}</pre> 
+      </li> 
+      <li>Why not return <code>null</code> if there is no match? </li> 
+      <li><code>Int</code> can't be <code>null</code></li> 
+      <li><code>null</code> might be a valid value in the collection</li> 
+      <li><code>null</code> can lead to <code>NullPointerException</code></li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab8/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 0</h1>
+    <ol><li>Make an SBT project <code>lab8</code>:
+        <pre>cd cs152 # <cite>(or whereever you store your git repo)</cite>
+PROJECT=lab8 # <cite>(or whatever project you want to make)</cite>
+echo $PROJECT | sbt new cayhorstmann/cs152-seed.g8
+cd $PROJECT
+find . -name Hello*.scala -exec rm {} \;
+</pre></li>
+      <li>If you use Eclipse, run
+        <pre>sbt eclipse
+</pre> Then start Eclipse and import the project.</li>
+      <li>If you use IntelliJ, load the SBT project from the <code>lab8</code> directory.</li>
+    </ol>
+    <h1>Step 1</h1> 
+    <ol>
+      <li>Here is the complete application that was discussed in the lecture: 
+        <pre>import scala.util.parsing.combinator._
+
+class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Any] = term ~ opt(("+" | "-") ~ expr)
+  def term: Parser[Any] = factor ~ opt(("*" | "/" ) ~ term)
+  def factor: Parser[Any] = wholeNumber | "(" ~ expr ~ ")"
+}
+
+object Lab8 extends App {
+  val parser = new SimpleLanguageParser
+  val result = parser.parse(parser.expr, "3 - 4 * 5")
+  println(result.get) 
+}</pre> 
+      </li> 
+      <li>Run the application. What is the output? </li> 
+      <li>Now change the expression to 3 * 4 - 5. How does the output differ? </li> 
+      <li>How does this indicate that the grammer “knows” that multiplication binds more strongly than addition?</li> 
+      <li>The <code>factor</code> rule recurses back to the <code>expr</code> rule. Give an example input to the parser that demonstrates this feature. What is your input? What is the output?</li> 
+      <li>What happens when you give an illegal input to the parser? What input did you give, and what was the result?</li> 
+    </ol> 
+    <h1>Step 2</h1> 
+    <ol>
+      <li>Add the following function to the <code>SimpleLanguageParser</code> (and <em>not</em> to <code>Lab8</code>): 
+        <pre>def eval(x : Any) : Int = x match {
+  case a ~ Some("+" ~ b) =&gt; eval(a) + eval(b)
+  case a ~ Some("-" ~ b) =&gt; eval(a) - eval(b)
+  case a ~ Some("*" ~ b) =&gt; eval(a) * eval(b)
+  case a ~ Some("/" ~ b) =&gt; eval(a) / eval(b)
+  case a ~ None =&gt; eval(a)
+  case a : String =&gt; Integer.parseInt(a)
+  case "(" ~ a ~ ")" =&gt; eval(a)
+}</pre> 
+      </li> 
+      <li>
+        <p>In your main program, print the value computed by <code>parser.eval(result.get)</code>. What output do you get when the parser input is 3 - 4 * 5? 3 * 4 - 5?</p> 
+      </li> 
+      <li>What does the <code>eval</code> function do? </li> 
+      <li>Give an input that shows that the last matching rule is necessary. What is your input? What is the output? What result do you get when you comment out the last matching rule?</li> 
+    </ol> 
+    <h1>Step 3</h1> 
+    <ol>
+      <li>Now we want to enhance the language and add support for statements such as 
+        <pre>val x = 3 + 4 * y</pre> 
+        <p>In BNF, this would be </p> 
+        <pre>valdef ::= "val" identifier "=" expr</pre> 
+        <p>Add a <code>valdef</code> type to the combinator parser that represents such a definition. (To see how to parse an identifier, go to the
+          <a href='https://static.javadoc.io/org.scala-lang.modules/scala-parser-combinators_2.12/1.1.0/scala/util/parsing/combinator/index.html'>scaladoc</a> of <code>JavaTokenParsers</code> and then click on the source link on the top of the file.)</p> 
+        <p>What is the type that you added?</p> 
+      </li> 
+      <li>What do you get when you parse <code>val x = 3 + 4</code>? Hint: Remember to call 
+        <pre>parser.parse(parser<strong>.valdef</strong>, "val x = 3 + 4")</pre> 
+      </li> 
+      <li>What happens when you parse <code>val x = 3 + 4 * y</code>? (Hint: Look closely at the output. Where is the y? Why?) </li> 
+      <li>What do you do to fix the problem? (Hint: Handle variable identifiers at the same level as numbers.)</li> 
+      <li>Now what is the parser output? </li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture9/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:19 GMT -->
+</html>

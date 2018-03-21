@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture13/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 13</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Scope</h1> 
+    <ul>
+      <li>Scope of named entity = region where name references the entity</li> 
+      <li>Scopes can overlap</li> 
+      <li>
+        <pre>class Example // Java
+{
+private int foo;
+public void fun(double foo) {
+    System.out.println(foo); // Which foo? 
+  }
+  public void fun() {
+    System.out.println(foo); // Which foo? 
+  }
+}</pre> 
+      </li> 
+      <li>Particularly common in languages with nested functions 
+        <pre>def fun(x : Int) { // Scala
+  def helper() { var x : Int; ... }
+  ...
+}</pre> 
+      </li> 
+    </ul> 
+    <h1>Static vs. Dynamic Scoping</h1> 
+    <ul>
+      <li>Static scope: Depends on program source only</li> 
+      <li>Dynamic scope: Depends on execution history</li> 
+      <li>Example 
+        <pre>val x = 1;
+def f(y) = x + y;
+def g() { val x = 2; f(x) };
+g()</pre> 
+      </li> 
+      <li>Static scoping: Result is 1 + 2</li> 
+      <li>Dynamic scoping: Result is 2 + 2</li> 
+      <li>Dynamic scoping is common in interpreted languages (see lab)</li> 
+      <li>Disadvantage: Meaning of program harder to understand</li> 
+    </ul> 
+    <h1>Implementation of Dynamic Scoping</h1> 
+    <ul>
+      <li>Global symbol table</li> 
+      <li>Push definition when it is encountered, pop at end of scope</li> 
+      <li>Example: 
+        <pre>val x = 1;
+def f(y) = x + y;
+def g() { val x = 2; f(x) };
+g()</pre> 
+        <p></p> 
+        <pre>x -&gt; 1 // first def. of x
+x -&gt; 2, x -&gt; 1 // def. of x inside g
+y -&gt; 2, x -&gt; 2, x -&gt; 1 // def. of parameter y</pre> 
+      </li> 
+    </ul> 
+    <h1>Implementation of Static Scoping</h1> 
+    <ul>
+      <li>Each function has its own symbol table</li> 
+      <li>Records the meanings of symbols when the function was defined</li> 
+      <li>Function body is evaluated with that table (augmented by parameter bindings)</li> 
+      <li>Example: 
+        <pre>val x = 1;
+def f(y) = x + y; <strong>// x -&gt; 1</strong>
+def g() { val x = 2; f(x) }; // <strong>f -&gt; ...</strong>
+    </pre> 
+        <p>Table only needs to store <em>free</em> variables in function body</p> 
+      </li> 
+      <li>When f is executed: 
+        <pre>y -&gt; 2, <strong>x -&gt; 1</strong></pre> 
+      </li> 
+    </ul> 
+    <h1>Implementing Recursive Functions</h1> 
+    <ul>
+      <li>Can't use <code>val</code>: 
+        <pre>val fac = x =&gt; if (x == 0) 1 else x * fac(x - 1)</pre> 
+      </li> 
+      <li>RHS is an anonymous function with free variable <code>fac</code> 
+        <pre>x =&gt; if (x == 0) 1 else x * fac(x - 1)</pre> 
+      </li> 
+      <li>Then a new variable <code>fac</code> is defined</li> 
+      <li><code>def</code> <em>simultaneously</em> adds <code>fac</code> and RHS to symbol table 
+        <pre>case class Closure(params : List[String], body : Block, <strong>var</strong> env : List[(String, Any)])
+ ...
+def evalDef(symbols : List[(String, Any)], defn : Definition) =
+  defn match {
+    case Defdef(name, Function(params, body)) =&gt; {
+      val cl = Closure(params, body, symbols)
+      val syms = (name, cl) :: symbols
+      cl.env = syms <strong>// mutation</strong>
+      syms
+    }
+    ...
+  }      </pre> 
+      </li> 
+      <li>Here, for the first time, we use a <code>var</code> in Scala. </li> 
+      <li>Pure functional solution is possible but complex (Google for Y combinator). </li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab12/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Bash</h1> 
+    <ul>
+      <li>Launch your bash shell. </li> 
+      <li>Next, some background information. The <code>bash</code> command shell has a rudimentary programming language. Here are some of its features. 
+        <ol>
+          <li>You declare global variables with the syntax 
+            <pre><var>varname</var>=<var>initialValue</var></pre> 
+          </li> 
+          <li>You declare functions with the syntax 
+            <pre>function <var>funname </var>{
+   . . .
+}
+</pre> 
+            <p>Function parameters are not named. Instead, you refer to them as <code>$1</code>, <code>$2</code>, <code>$3</code>...
+ </p> 
+          </li> 
+          <li>You call functions with the syntax
+ 
+            <pre><var>funname arg1 arg2 arg3 </var>. . .
+</pre> 
+          </li> 
+          <li>You declare local variables (inside functions) with the syntax
+ 
+            <pre>local <var>varname</var>=<var>initialValue</var></pre> 
+          </li> 
+          <li>You get the value of a variable with the syntax
+ 
+            <pre>$<var>varname</var></pre> 
+            <p>For example, the command
+ </p> 
+            <pre>echo $a
+</pre> 
+            <p>prints the value of a</p> 
+          </li> 
+        </ol> 
+      </li> 
+    </ul> 
+    <h1>Step 1: Bash (Continued)</h1> 
+    <ol>
+      <li>Make a file <tt>test1.bash</tt> with the contents 
+        <pre>x="2"
+
+function f {
+   echo $x
+}
+
+function main {
+   local x="3" ; 
+   f ;
+}
+
+main
+</pre>. 
+      </li> 
+      <li>Start the bash shell. Run the program: <tt>source test1.bash</tt>. What does it print?</li> 
+      <li>What does that tell you about variable scoping in the bash language?
+ </li> 
+    </ol> 
+    <h1>Step 2: More Bash</h1> 
+    <ol>
+      <li>Make a file <tt>test2.bash</tt> with the contents. 
+        <pre>x="2"
+
+function f {
+   echo $x
+}
+
+function g {
+   local x="3" ; 
+   f ;
+}
+
+function main {
+   local x="4" ;
+   f ;
+   g ;
+   f ;
+}
+
+f ;
+main 
+
+</pre> 
+        <p>What do you expect this program to print?</p> 
+      </li> 
+      <li>Start the bash shell. Run the program: <tt>source test2.bash</tt>. What does it print?
+ </li> 
+      <li>Explain the behavior by drawing diagrams of the symbol table. </li> 
+    </ol> 
+    <h1>Step 3: Understanding Closures in SL1</h1> 
+    <ol>
+      <li>Consider the SL1 program 
+        <pre>val a = 3;
+val f = { x =&gt; x * a };
+val g = { a =&gt; a * f(a)};
+g(1)</pre> 
+        <p>What result output do you expect?</p> 
+      </li> 
+      <li>Start the SL1 interpreter from the previous lab and run the program. What output did you get?</li> 
+      <li>Place a breakpoint in the line 
+        <pre>case Valdef(name, Function(params, body)) =&gt; { (name, Closure(params, body, symbols)) :: symbols }</pre> 
+        <p>Run the debugger with the same program as input. When the breakpoint is hit, inspect <code>symbols</code>. What do you get for <code>symbols</code> when the definitions of <code>f</code> and <code>g</code> are evaluated?</p> 
+      </li> 
+      <li>Change the code for 
+        <pre>case Funcall(fun, args) =&gt; eval(fun, symbols) match</pre> 
+        <p>to </p> 
+        <pre>case Funcall(fun, args) =&gt; val funval = eval(fun, symbols); funval match</pre> 
+        <p>Debug the program again, this time with a breakpoint in the line </p> 
+        <pre>evalBlock(body, params.zip(args.map(eval(_, symbols))) ::: syms)</pre> 
+        <p>The breakpoint will be triggered when <code>g</code> and <code>f</code> are executed. What are the values of <code>symbols</code> and the <code>syms</code> in the closure object when <code>g</code> is executed?</p> 
+      </li> 
+      <li>With what symbol table is the body of <code>f</code> executed? </li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture13/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+</html>

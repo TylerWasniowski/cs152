@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture3/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 3</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Blocks</h1>
+
+    <ul><li>In Scala, a block is an expression with a value.
+        <pre>val distance = {
+  val dx = x2 - x1
+  val dy = y2 - y1
+  math.sqrt(dx * dx + dy * dy)
+}
+</pre></li>
+      <li>The last expression in the block is the value of the block.</li>
+      <li>Common in complex recursions.
+        <pre>def digitsum(n: Int): Int = if (n == 0) 0 else {
+  val last = n % 10
+  val rest = n / 10
+  last + digitsum(rest)
+}
+</pre></li>
+    </ul>
+    <h1>Local Functions</h1>
+
+    <ul><li>You can define a function inside another function:
+        <pre>def distance(x1: Int, x2: Int, y1: Int, y2: Int) = {
+  def sq(x: Int) = x * x
+  math.sqrt(sq(x2 - x1) + sq(y2 - y1))
+}
+</pre></li>
+      <li>Useful for recursive helper functions.
+        <pre>def digitsum(n: Int) = {
+  @tailrec def digitsumHelper(n: Int, sum: Int): Int = if (n == 0) sum else
+    digitsumHelper(n / 10, sum + n % 10)
+  digitsumHelper(n, 0)
+}
+</pre></li>
+      <li><code>@tailrec</code> tells Scala that you believe that the recursion can be rewritten as a loop.
+        <pre>def digitsumHelper(n: Int, sum: Int): Int = {
+  start:
+    if (n == 0) sum else {
+      n = n / 10
+      sum = sum + n % 10
+      goto start
+    }
+}
+</pre></li>
+      
+    </ul>
+    <h1>Lists</h1> 
+    <ul>
+      <li>Very different from Java linked lists. No iterators</li> 
+      <li>Three primitives: head, tail, <code>::</code> (pronounced cons) </li> 
+      <li>A list is either empty (<code>Nil</code>) or has a head and tail 
+        <pre>val lst = List(1, 4, 9)
+lst.head // 1
+lst.tail // List(4, 9)
+lst.tail.tail.tail // Nil</pre> 
+      </li> 
+      <li>Use <code>::</code> to build lists 
+        <pre>0 :: lst // List(0, 1, 4, 9)</pre> 
+      </li> 
+    </ul> 
+    <h1>List Functions</h1> 
+    <ul>
+      <li>Use recursion for list functions 
+        <pre>def sum(lst : List[Int]) : Int = 
+  if (lst.isEmpty) 
+    0 else 
+    lst.head + sum(lst.tail)</pre> 
+      </li> 
+      <li>Use <code>::</code> to recursively build lists 
+        <pre>def squares(n : Int) : List[Int] = 
+  if (n == 0) 
+    List(0) else
+    n * n :: squares(n - 1)</pre> 
+      </li> 
+    </ul> 
+    <h1>Why This Isn't Inefficient</h1> 
+    <ul>
+      <li><code>lst.tail</code> doesn't make a new list—it is a reference to the tail cell 
+        <p><img width='368' src='cons-cells.png' alt=''/></p> 
+      </li> 
+      <li>Works because lists are immutable</li> 
+    </ul>
+
+    <h1>More Recursion Examples</h1>
+
+      <ul><li>
+          <pre>def append(a: List[Int], b: List[Int]): List[Int] = if (a.isEmpty) b else
+  a.head :: append(a.tail, b)
+</pre></li>
+        <li><pre>def reverse(a: List[Int]): List[Int] = if (a.isEmpty) a else
+  append(reverse(a.tail), List(a.head))
+</pre></li>
+      <li><pre>reverse((1 to 1000000).toList)
+(1 to 1000000).toList.reverse
+</pre></li>
+      <li><pre>def reverse(a: List[Int]) = {
+  @tailrec def reverseHelper(a: List[Int], reversed: List[Int]): List[Int] =
+    if (a.isEmpty) reversed else reverseHelper(a.tail, a.head :: reversed)
+  reverseHelper(a, Nil)
+}
+</pre></li>
+    </ul>
+
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab2/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Lists</h1> 
+    <ol>
+      <li>What is the type of <code>1 :: 2 :: 3 :: Nil</code>? (Just ask the Scala interpreter)</li> 
+      <li>What is the type of <code>1 :: "Hello" :: Nil</code>?</li> 
+      <li>What happens when you evaluate the expression <code>1 :: 2 :: 3</code>? Why?</li> 
+      <li>How do you make a list of the elements <code>"San"</code>, <code>"José"</code>, <code>"State"</code>, <code>"University"</code> using a list constructor? (Be sure to try your answer in the Scala interpreter)</li> 
+      <li>How do you make a list of the elements <code>"San", <code>"José"</code>, <code>"State"</code>, "University"</code> using the cons (<code>::</code>) operator? </li> 
+    </ol> 
+    <h1>Step 2: List Functions</h1> 
+    <ol>
+      <li>Write a recursive function <code>concat</code> that concatenates all strings in a <code>List[String]</code>, yielding a <code>String</code>. Hint: (1) String concatenation is <code>+</code> in Scala, just like in Java (2) <code>concat(Nil)</code> is <code>""</code>. (3) Think about <code>concat(lst)</code> in terms of <code>lst.head</code>, <code>lst.tail</code>. 
+        <p>Give the code of your function. </p> 
+      </li> 
+      <li>What is the result of <code>concat(List("San", "José", "State", "University"))</code>?</li> 
+      <li>How can you modify <code>concat</code> so that it adds spaces between the strings (i.e. so that <code>concat(List("San",  "José",  "State", "University"))</code> is <code>"San José State University"</code> but <em>not</em> <code>"San José State University "</code> or <code>" San José State University"</code>? </li> 
+      </ol>      
+    </body>
+    <h1>Step 3: More Recursion</h1>
+    <ol><li>Given a list, form a list of all pairs of elements (as lists of length 2) in some order. If the original list has length <var>n</var>, form <var>n</var><sup>2</sup> pairs. What should <code>pairs(List(1, 2, 3))</code> produce?</li>
+      <li>What is your strategy for recursion? Base case? Reduction to simpler case?</li>
+      <li>What is your Scala code?</li>
+    </ol>
+    <h1>Step 4: Not Always Recursion</h1>
+    <ol><li>How can you implement the <code>squares</code> function from the lecture without recursion?</li>
+      <li>The <code>flatten</code> method flattens out a list of lists into a list. To see what it does, just try out
+        <pre>List(List(1, 2),List(3, 4, 5)).flatten</pre>
+        Assuming that you are allowed to use this method, how can you implement the <code>pairs</code> function of Step 3 without recursion?</li>
+    </ol>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture3/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+</html> 

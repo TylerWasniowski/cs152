@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture17/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:22 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 17</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Generics</h1>
+    <ul><li>Type parameters like in Java, but in square brackets
+        <ul><li><code>List(1, 2, 7, 9)</code> is a <code>Vector[Int]</code></li>
+        </ul></li>
+      <li><pre>abstract class GList[+E] {
+  def head: E
+  def tail: GList[E]
+  def isEmpty: Boolean
+  ...
+}</pre></li>
+      <li><code>+E</code> means that type parameter is covariant:
+        <ul><li>Can assign a <code>GList[String]</code> to a <code>GList[Any]</code></li>
+        </ul></li>
+      <li>Type bounds, like in Java:
+        <pre>def cons[H &gt;: E](h: F): GList[H] = new GNonEmpty(h, this)
+def ::[H &gt;: E](h: H): GList[H] = new GNonEmpty(h, this)  
+</pre></li>
+      <li>A mixed-type list has most common supertype:
+        <ul><li><code>42 :: "Fred" :: GEmpty</code> is a <code>List[Any]</code></li>
+          <li><code>GEmpty</code> doesn't have a type parameter:
+            <pre>case object GEmpty extends GList[Nothing] { ... }
+</pre></li>
+        </ul></li>
+      </ul>
+      <h1>Heterogeneous Lists</h1>
+      <ul><li><code>List[Any]</code> isn't so great:
+          <pre>val lst = 1 :: "Fred" :: Nil
+val str = lst.tail.head.toUpperCase // Won't compile
+</pre></li>
+        <li>Want a list of any type, but it should be strongly typed.
+          <pre>abstract class HList[H, T &lt;: HList[_, _]] {
+  def head: H
+  def tail: T
+}
+
+case object HEmpty extends HList[Nothing, Nothing] {
+  def head = ???
+  def tail = ???
+  def ::[A](a: A) = HNonEmpty(a, this)
+}
+
+case class HNonEmpty[H, T &lt;: HList[_, _]](head: H, tail: T) extends HList[H, T] {
+  def ::[A](a: C) = HNonEmpty(a, this)
+}
+</pre></li>
+      </ul>
+    <h1>Heterogeneous Lists</h1>
+    <ul><li>An <code>HList</code> has a type that matches the element types:
+          <pre>val lst = 42 :: "Fred" :: HEmpty
+  // has type HNonEmpty[Int, HNonEmpty[String, HEmpty.type]]
+</pre></li>
+        <li>Easier on the eyes with type aliases:
+          <pre>type ::[H, T &lt;: HList[_, _]] = HNonEmpty[H, T]
+type HNil = HEmpty.type
+val result: Int :: String :: HNil = lst
+</pre></li>
+        <li>Now let's append two of them:
+          <pre>abstract class HList[H, T &lt;: HList[_, _]] {
+  def append[L &lt;: HList[_, _]](lst: L): __________
+}</pre></li>
+        <li>What is the return type?</li>
+      </ul>
+      <h1>Type-Level Programming</h1>
+      <ul><li>Define return type alias:
+          <pre>abstract class HList[H, T &lt;: HList[_, _]] {
+  ...
+  type Append[L &lt;: HList[_, _]] &lt;: HList[_, _]
+  def append[L &lt;: HList[_, _]](lst: L): Append[L]
+}
+case object HEmpty extends HList[Nothing, Nothing] {
+  ...
+  type Append[L &lt;: HList[_, _]] = L
+  def append[L &lt;: HList[_, _]](lst: L) = lst
+}
+case class HNonEmpty[H, T &lt;: HList[_, _]](head: H, tail: T) extends HList[H, T] {
+  ...
+  type Append[L &lt;: HList[_, _]] = HNonEmpty[H, T#Append[L]]
+  def append[L &lt;: HList[_, _]](lst: L) = HNonEmpty(head, tail.append(lst))
+}</pre></li>
+        <li>Now the type is properly computed:
+          <pre>val lst = 42 :: "Fred" :: HEmpty // Type Int :: String :: HNil 
+val lst2 = lst.append(lst) // Type Int :: String :: Int :: String :: HNil</pre></li>
+      </ul>
+    
+    <h1>Ad Hoc Type Safety with Implicits</h1>
+    <ul><li>Some types can be converted to JSON:
+        <pre>abstract class JsonConverter[T] { // like Java interface
+  def convert(t: T): String
+}</pre></li>
+      <li>If we have such a converter, we can of course convert an object:
+        <pre>def toJson[T](t: T, converter: JsonConverter[T]) = converter.convert(t)
+</pre></li>
+      <li>Implicit parameters let the type system do the matching:
+        <pre>implicit object stringJsonConverter extends JsonConverter[String] {
+    def convert(t: String) = "\"" + t.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+  }
+def toJson[T](t: T)(<b>implicit</b> converter: JsonConverter[T]) = converter.convert(t)
+</pre></li>
+      <li>Now <code>toJson("Fred")</code> compiles, but <code>json(new File("Fred"))</code> doesn't.</li>      
+    </ul>
+    <h1>Context Bounds</h1>
+    <ul><li>Alternate formulation of the <code>toJson</code> function:
+        <pre>def toJson[T <b>: JsonConverter</b>](t: T) = implicitly[JsonConverter[T]].convert(t)
+</pre></li>
+      <li>Now we want to convert lists.</li>
+      <li>Unfortunately, objects can't have type parameters, so we can't define an <code>implicit object listJsonConverter[E]</code>. Workaround:
+        <pre>implicit def listJsonConverter[E  : JsonConverter]:
+    JsonConverter[List[E]] = new JsonConverter[List[E]] {
+  def convert(ts: List[E]) = ts.map(toJson(_)).mkString("[", ",", "]")
+}</pre></li>
+      <li>Now you can call
+        <pre>toJson(List("Fred", "Wilma"))
+toJson(List(List(1, 7), List(2, 9)))
+</pre> but not
+        <pre>toJson(List(new File("Fred"), new File("Wilma")))
+</pre></li>
+    </ul>
+    <h1>Lab</h1> 
+    <p class='halfimage'><img src='../../../sjsu/images/lab.html' alt='???'/></p> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture17/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:22 GMT -->
+</html>

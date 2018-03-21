@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture5/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 5</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Higher Order Functions</h1>
+
+    <ul><li>A higher order function consumes or produces another function.</li>
+      <li>Example of consumption: <code>map</code>
+        <pre>(1 to 10).map(<b>x =&gt; x * x</b>)
+</pre></li>
+      <li>Why would you want to produce a function?</li>
+      <li>And how?</li>
+    </ul>
+    
+
+    <h1>Producing Functions</h1>
+
+    <ul><li>We can define a function
+        <pre>def triple(x: Int) = 3 * x</pre></li>
+      <li>Then we can use it:
+        <pre>(1 to 10).map(triple)</pre></li>
+      <li>Here is another:
+        <pre>def quadruple(x: Int) = 4 * x
+(1 to 10).map(quadruple)
+</pre></li>
+      <li>What about a generic “multiply by n” function so that I can write:</li>
+      <pre>(1 to 10).map(multiplyBy(5))
+</pre></ul>
+    <h1>Producing Functions</h1>
+
+    <ul>
+      <li><code>multiplyBy(5)</code> needs to produce a function...</li>
+      <li>of type <code>Int =&gt; Int</code>:
+        <pre>def multiplyBy(n: Int) : Int =&gt; Int = ...
+</pre></li>
+      <li>It needs to produce a function that consumes an integer:
+        <pre>... = (x: Int) =&gt; ...
+</pre></li>
+      <li>and the result is <code>n * x</code>.</li>
+      <li>Now all together:
+        <pre>def multiplyBy(n: Int) : Int =&gt; Int = (x: Int) =&gt; n * x
+</pre></li>
+      <li>The return type is inferred:
+        <pre>def multiplyBy(n: Int) = (x: Int) =&gt; n * x
+</pre></li>
+    </ul>
+
+    <h1>Comparators</h1>
+
+    <ul><li>Comparators used for sorting:
+        <pre>List(1, 2, 3).sortWith(_ &gt; _)
+</pre></li>
+      <li>Want to turn a discriminator function into a comparator:
+        <pre>strings.sortWith(comparingBy(s =&gt; s.length())
+</pre></li>
+        <li>What does <code>comparingBy</code> produce?
+          <ul><li>A function <code>(String, String) =&gt; Boolean</code></li>
+          </ul></li>
+        <li>What does <code>comparingBy</code> consume?
+          <ul><li>A function <code>String =&gt; Integer</code></li>
+          </ul></li>
+        <li><pre>def comparingBy(f: String =&gt; Integer) =
+   (x: String, y: String) =&gt; ... // <cite>A <code>Boolean</code></cite>
+</pre></li>
+        <li>The rest is simple:
+          <pre>... =&gt; f(x) &lt; f(y)</pre></li>
+      </ul>
+    </body>
+
+    <h1>Composing Comparators</h1>
+    <ul><li>Preparation: Make <code>comparingBy</code> generic.
+        <pre>def comparingBy[T, R : Ordering](f: T =&gt; R) = { // <cite>Don't worry about the details</cite>
+  import scala.Ordered.orderingToOrdered
+  (x: T, y: T) =&gt; f(x) &lt; f(y)
+} </pre></li>
+      <li>Now it works for a map <code>Person =&gt; String</code>:
+        <pre>case class Person(first: String, last: String)
+val people = List(Person("Fred", "Flintstone"), Person("Fred", "Brooks"), Person("Barney", "Rubble"))
+people.sortWith(comparingBy(_.first))
+</pre></li>
+      <li>Now we want to compare by first name, using the last name to break ties:
+        <pre>people.sortWith(breakingTies(comparingBy(_.first), comparingBy(_.last)))
+</pre></li>
+    </ul>
+
+    <h1>Composing Comparators</h1>
+
+    <ul><li>What does <code>breakingTies</code> produce?</li>
+      <li>A function <code>(Person, Person) =&gt; Boolean</code></li>
+      <li>What does <code>breakingTies</code> consume?</li>
+      <li>Two functions <code>(Person, Person) =&gt; Boolean</code></li>
+      <li><pre>def breakingTies(c1: (Person, Person) =&gt; Boolean, c2: (Person, Person) =&gt; Boolean) =
+   (x: Person, y: Person) =&gt; ... // <cite>A <code>Boolean</code></cite></pre></li>
+      <li><pre>=&gt; if (c1(x, y)) true else
+  if (c1(y, x)) false else
+  c2(x, y)</pre></li>
+    </ul>
+
+    <h1>Currying</h1> 
+    <p class='rightimage'><img src='haskell-curry.jpg' alt=''/></p> 
+    <ul>
+      <li>Currying = Turning a function that takes two arguments into a function that takes one argument. That function returns a function that consumes the second argument. (Named after the logician Haskell Brooks Curry)</li> 
+      <li>Huh?</li> 
+      <li>Simple example: 
+        <pre>def multiply(x : Int, y : Int) = x * y
+multiply(3, 4) is 12</pre></li><li>Now let's do this a little different:
+        <pre>
+def multiply(x : Int)(y : Int) = x * y
+multiply(3)(4) is 12</pre> 
+      </li> 
+      <li>What is <code>multiply(3)</code>? </li> 
+      <li>A function that is capable of eating 4, thus yielding 12:
+        <pre>def multiply(x: Int) = (y: Int) =&gt; x * y // <cite>That's our <code>multiplyBy</code></cite>
+</pre></li>
+      <li>Can make higher-order functions easier on the eye:
+        <pre>def comparingBy(f: String =&gt; Integer) = (x: String, y: String) =&gt; f(x) &lt; f(y)
+def comparingBy(f: String =&gt; Integer)(x: String, y: String) = f(x) &lt; f(y)      </pre>
+      </li>
+      <li>Similar to the rewrite of a <code>val</code> to a <code>def</code>:
+        <pre>val triple = (x: Int) =&gt; 3 * x
+def triple(x: Int) = 3 * x
+</pre></li>
+      </ul>
+   
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab4/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul>
+    <h1>Step 1: Short Function Notation</h1> 
+        <p>Define a variable <code>lst</code> as</p> 
+        <pre>val lst = List("Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf")</pre> 
+      <p>What is the shortest command you can use to </p>
+        <ol>
+          <li>Yield all short strings (of length &lt; 5) from <code>lst</code></li> 
+          <li>Yield the words sorted by increasing length</li> 
+          <li>Find the longest string (using <code>reduce</code>)</li> 
+        </ol> 
+    
+       
+     
+    <h1>Step 2: Currying</h1>
+
+
+    <ul><li>Write a function <code>makeMin</code> that consumes a comparator (a function <code>(String, String) =&gt; Boolean</code>) and produces a function <code>(a: String, b: String) =&gt; String</code> that computes the smaller of the two inputs, as measured by the comparator.</li>
+      <li>Did you use Currying? If so, pat yourself on the back. Now do it the other way around. Or if you did it the other way around, do it with currying.</li>
+      <li>Make your function generic. Just replace <code>String</code> with <code>T</code> and stick a <code>[T]</code> right after the function name. Don't worry—it won't hurt a bit.</li>
+    </ul>
+
+    <h1>Step 3: More Currying</h1> 
+    <ol>
+      <li>Here is a function of computing the “maximum” string in a list that works for any ordering. 
+        <pre>def max(lst : List[String], less : (String, String) =&gt; Boolean) =
+  lst.reduce((x, y) =&gt; if (less(x, y)) y else x)</pre> 
+        <p>Make a call to <code>max</code> that yields the longest string in a list <code>lst</code>. Use <code>_</code> for the string parameters in your <code>less</code> function. </p> 
+      </li> 
+      <li>Now make this generic. Don't worry—it won't hurt a bit: 
+        <pre>def max[T](lst : List[T], less : (T, T) =&gt; Boolean) =
+  lst.reduce((x, y) =&gt; if (less(x, y)) y else x)</pre> 
+        <p>What happens when you call <code>max(lst, _ &lt; _)?</code></p> 
+      </li> 
+      <li>Ok, that didn't work so well. Currying to the rescue. Curry the <code>max[T]</code> function, exactly like <code>multiply</code> above. What is the code for your revised function? What happens when you call <code>max(lst)(_ &lt; _)</code>? 
+        <p>(Why does this work? Now the Scala type inferencer knows that <code>T</code> must be <code>String</code> after processing <code>max(lst)</code>.)</p> 
+      </li> 
+    </ol>        
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture5/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+</html> 

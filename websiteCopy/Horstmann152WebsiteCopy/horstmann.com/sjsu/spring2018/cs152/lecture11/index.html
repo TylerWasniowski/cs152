@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture11/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:19 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 11</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Parsing 5</h1> 
+    <ul>
+      <li>Grammar techniques</li> 
+      <li>Repetition</li> 
+      <li>Precedence and associativity</li> 
+      <li>LL(1) grammars</li> 
+      <li>Avoiding left recursion</li> 
+      <li>Left factoring</li> 
+      <li>Ambiguity</li> 
+    </ul> 
+    <h1>Reminder: Context-Free Grammar</h1> 
+    <ul>
+      <li>Productions 
+        <pre>expr ::= term (( "+" | "-" ) expr)?
+term ::= factor (( "*" | "/" ) term)?
+factor ::= wholeNumber | "(" expr ")"</pre> 
+      </li> 
+      <li>Non-terminals <code>expr term factor</code></li> 
+      <li>Terminals (tokens) <code>wholeNumber</code> "<code>(</code>" <code>"+"</code> ...</li> 
+      <li>Parse tree shows derivation process 
+        <p><img src='../lecture9/parsetree.png' alt=''/></p> 
+      </li> 
+    </ul> 
+    <h1>Repetition</h1> 
+    <ul>
+      <li>Simple repetition, ex. array bounds <code>[10][10][20]</code> 
+        <pre>bounds ::= bound | bound bounds
+bound = "[" number "]"</pre> 
+      </li> 
+      <li>Or in EBNF 
+        <pre>bounds ::= (bound)+</pre> 
+      </li> 
+      <li>In Scala, simply collect all 
+        <pre>def bounds = bound ~ rep(bound) ^^ { case head ~ tail =&gt; head :: tail }
+bound = "[" ~&gt; number &lt;~ "]" ^^ { _.toInt } </pre> 
+      </li> 
+      <li>Or use <code>rep1</code> convenience combinator 
+        <pre>def bounds = rep1(bound)</pre> 
+        <p>No transform needed</p> 
+      </li> 
+      <li>Repetition with separators, ex. function arguments <code>id(arg1, arg2, ...)</code> 
+        <pre>funcall ::= ident ~ "(" ~ expr ("," expr)* ")"</pre> 
+      </li> 
+      <li>Scala convenience combinator 
+        <pre>def funcall = ident ~ "(" ~&gt; repsep(expr, ",") &lt;~ ")"</pre> 
+        <p><code>repsep</code> returns <code>List</code> without separators; here, <code>List[Expr]</code></p> 
+      </li> 
+    </ul> 
+    <h1>Operator Precedence</h1> 
+    <ul>
+      <li>Term/factor levels make <code>* /</code> stronger than <code>+ -</code>: 
+        <pre>expr ::= term (( "+" | "-" ) expr)?
+term ::= factor (( "*" | "/" ) term)?
+factor ::= wholeNumber | "(" expr ")"</pre> 
+      </li> 
+      <li>Even stronger operator, say ^ for “raise to a power” 
+        <pre>term ::= factor (( "*" | "/" ) term)?
+factor ::= <strong>factor1</strong> ( "^" factor )?
+<strong>factor1</strong> ::= wholeNumber | "(" expr ")"</pre> 
+      </li> 
+      <li>Weaker operator, say <code>== &lt;&gt;</code> 
+        <pre>expr ::= <strong>expr1</strong> (( "==" | "&lt;&gt;" ) expr)?
+<strong>expr1</strong> ::= term (( "+" | "-" ) expr1)?
+term ::= factor (( "*" | "/" ) term)?
+factor ::= wholeNumber | "(" expr ")"</pre> 
+      </li> 
+    </ul> 
+    <h1>Operator Associativity</h1> 
+    <ul>
+      <li>Right recursion is naturally right associative 
+        <pre>assignment ::= ident ":=" assignment | ident ":=" expr</pre> 
+      </li> 
+      <li>For example, 
+        <pre>a := b := 3</pre> 
+        <p>parses as</p> 
+        <p><img height='259' width='227' src='exprtree4.png' alt=''/></p> 
+      </li> 
+      <li>Left recursion is naturally left recursive, but undesirable for us</li> 
+      <li>See Lecture 10 for remedy</li> 
+    </ul> 
+    <h1>LL(1) Grammars</h1> 
+    <ul>
+      <li>Start from the grammar root</li> 
+      <li>Apply productions until input string is reached</li> 
+      <li>Which production? </li> 
+      <li>With some grammars, choice can be deterministic</li> 
+      <li>Desirable to have one-token lookahead property, called LL(1): Only one production can be chosen depending on the next token</li> 
+      <li>Example: <code>3 + 4 * 5</code></li> 
+      <li>Start from grammar root: <code>expr ::= term (( "+" | "-" ) expr)?</code></li> 
+      <li>After matching 3 as <code>term</code> → <code>factor</code> → <code>wholeNumber</code>, back in <code>term</code>: 
+        <pre>term ::= factor 
+term ::= factor ("*" | "/") term</pre> 
+      </li> 
+      <li>Should we go on with <code>("*" | "/") term</code>? No—next token is <code>"+"</code></li> 
+    </ul> 
+    <h1>Avoiding Left Recursion</h1> 
+    <ul>
+      <li>A grammar rule is left recursive if the left hand side appears at the beginning of the right hand side 
+        <pre>expr ::= expr "+" term | term</pre> 
+      </li> 
+      <li>Not LL(1) because there is no way of choosing between the two rules</li> 
+      <li>Infinite recursion in Scala combinator parser</li> 
+      <li>Can be removed by observing that eventually <code>expr</code> must be a <code>term</code> 
+        <pre>expr ::= term | term rest
+rest ::= "+" term rest</pre> 
+      </li> 
+      <li>Annoyance: Right recursion not convenient for left-associative operators</li> 
+      <li>Scala solution: Collect all terms and fold 
+        <pre>def expr = term ~ rep("+" ~&gt; term) ^^ 
+  { case a ~ lst =&gt;  (a /: lst) { Sum(_, _) } }</pre> 
+        <p>(See previous lecture for details)</p> 
+      </li> 
+    </ul> 
+    <ul>
+      <li>Left recursion is not a problem for bottom-up parsers (which we don't discuss in this class)</li> 
+    </ul> 
+    <h1>Left Factoring</h1> 
+    <ul>
+      <li>If a grammar has rules of the form 
+        <pre>A ::= α β | α γ</pre> 
+        <p>it can't be LL(1)</p> 
+      </li> 
+      <li>Example: 
+        <p>Assignment statement and procedure call both start with identifier</p> 
+        <pre>stat ::= ident ":=" expr | ident "(" expr ("," expr)* ")" | ...</pre> 
+      </li> 
+      <li>Factor out common left 
+        <pre>stat ::= ident rest | ...
+rest ::= ":=" expr | "(" expr ("," expr)* ")"</pre> 
+      </li> 
+      <li>Annoyance: Complicates semantic analysis because identifier is separated from assignment or call</li> 
+      <li>Scala solution: <code>opt</code> and match 
+        <pre>def stat = ident ~ (":=" expr | "(" expr ")")</pre> 
+      </li> 
+    </ul> 
+    <p></p> 
+    <h1>Ambiguity</h1> 
+    <ul>
+      <li><code>if</code> with optional <code>else</code> 
+        <pre>ifstat ::= "if" "(" expr ")" stat ("else" stat)?</pre> 
+      </li> 
+      <li>Gives rise to ambiguous construct 
+        <pre>if (c1) if (c2) s1 else s2</pre> <img height='259' width='275' src='iftree1.png' alt=''/> or<img height='259' width='275' src='iftree2.png' alt=''/> 
+      </li> 
+      <li>Disambiguation depends on parser technology</li> 
+      <li>Scala: The obvious rule gives the expected behavior (see Lab) 
+        <pre>(("if" ~ "(") ~&gt; expr &lt;~ ")") ~ stat ~ opt("else" ~&gt; expr)</pre> 
+      </li> 
+    </ul> 
+    <h1>Reading Grammars</h1> 
+    <ul>
+      <li>Useful skill, even outside programming language theory</li> 
+      <li>E.g. to determine correct file formats</li> 
+      <li>Variation in grammar syntax</li> 
+      <li>Terminals vs. nonterminals—some authors enclose nonterminals in <code>&lt;...&gt;</code> 
+        <pre>&lt;expr&gt; ::= &lt;term&gt; | &lt;term&gt; (+ | -) &lt;expr&gt;</pre> 
+        <p>Then no <code>"..."</code> around terminals</p> 
+      </li> 
+      <li><code>[...]</code>, <code>{...}</code> instead of <code>(...)?</code>, <code>(...)*</code></li> 
+    </ul> 
+    <p></p> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab10/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1</h1> 
+    <ol>
+      <li>Look at the <a href='http://www.xml.com/axml/testaxml.htm'>Annotated XML Specification</a> Section 3.1. Can you have spaces before an element name in a start tag? 
+        <pre>&lt; name&gt;</pre> 
+        <p>Which grammar rule did you use to answer this question?</p> 
+      </li> 
+      <li>Before the <code>/&gt;</code> in an empty-element tag? 
+        <pre>&lt;name /&gt;</pre> 
+        <p>Which grammar rule did you use to answer this question?</p> 
+      </li> 
+      <li>Around the <code>=</code> in an attribute? 
+        <pre>&lt;name attr = "value"&gt;</pre> 
+        <p>Which grammar rule did you use to answer this question?</p> 
+      </li> 
+    </ol> 
+    <h1>Step 2</h1> 
+    <ol>
+      <li>Write a Scala parser for the grammar 
+        <pre>expr ::= "if" "(" number ")" expr ("else" expr)? | number</pre> 
+        <p>What is your program? What do you get when you parse</p> 
+        <pre>if (1) if (2) 3 else 4</pre> 
+      </li> 
+      <li>Ok, it's probably too tedious to figure out whether the <code>else</code> associates with the first or second <code>if</code>. Enhance your program to yield a <code>IfExpr</code>. Use the following outline: 
+        <pre>class Expr
+case class IfExpr(cond : Number, pos : Expr, neg : Expr) extends Expr
+case class Number(value : String) extends Expr
+
+class SimpleLanguageParser extends JavaTokenParsers {    
+  def expr: Parser[Expr] = ... 
+  def number: Parser[Number] = wholeNumber ^^ { Number(_) }
+}</pre> 
+        <p>Transform <code>cond ~ expr ~ None</code> into <code>IfExpr(cond, expr, null)</code>.</p> 
+        <p>Now what do you get for </p> 
+        <pre>if (1) if (2) 3 else 4</pre> 
+      </li> 
+      <li>Does the Scala parser resolve the if/if/else ambiguity in the same way as C++, or the other way?</li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture11/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:20 GMT -->
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' lang='en' xml:lang='en'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture6/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:16 GMT -->
+<head>
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+    <meta name='copyright' content='Copyright  2016 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 6</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>Scala Documentation</h1> 
+    <ul>
+      <li>Online at <a href='http://www.scala-lang.org/api/2.12.4'>http://www.scala-lang.org/api/2.12.4</a></li> 
+      <li>Bookmark it right now!</li> 
+      <li>Use text field in upper right corner to filter classes 
+        <p><img height='218' width='196' src='scaladoc.png' alt=''/></p> 
+      </li> 
+    </ul> 
+    <h1>Categories of <code>List</code> Methods</h1> 
+    <ul>
+      <li>Basic methods <code>length head tail isEmpty</code></li> 
+      <li>Operators <code>:: :+ ++ == != /: :\</code></li> 
+      <li>Access by position <code>(<em>n</em>)</code> <code>take drop dropRight slice indexOf lastIndexOf</code></li>
+      <li>Methods without parameters <code>reverse sorted sum max min</code></li>
+      <li>Methods with unary predicates <code>count exists dropWhile filter find findIndexOf forall partition remove span takeWhile</code></li> 
+      <li>Methods with unary function <code>map reverseMap flatMap foreach </code></li> 
+      <li>Methods with binary predicate <code>sort</code></li> 
+      <li>Methods with binary function <code>reduceLeft reduceRight foldLeft foldRight</code></li> 
+      <li>Other <code>intersection union zip zipAll zipWithIndex mkString</code></li> 
+    </ul> 
+    <h1>List Operators</h1> 
+    <ul>
+      <li><code>::</code> appends in front, <code>:+</code> in back 
+        <pre>3 :: List(1, 2) is List(3, 1, 2)
+List(1, 2) :+ 3 is List(1, 2, 3)</pre> 
+      </li> 
+      <li><code>++</code> concatenate lists 
+        <pre>List(1, 2) ++ List(3, 4) is List(1, 2, 3, 4) // same as :::</pre> 
+      </li> 
+      <li><code>==</code> and <code>!=</code> compare lists 
+        <pre>List("Hello", "World") == List("Hel" + "lo", "Wor" + "ld") </pre> 
+      </li> 
+      <li><code>/:</code> and <code>:\</code> later</li> 
+    </ul> 
+    <h1>Operator Precedence and Associativity</h1> 
+    <p class='sideimage'><img src='Hello-Kitty-Calculator.jpg' alt=' '/></p> 
+    <ul>
+      <li>On this calculator, what do you get when you type 1 + 2 * 3?</li> 
+      <li>What do you get in C++?</li> 
+      <li>Precedence: Which operator is executed first? 
+        <pre>(1 + 2) * 3
+1 + (2 * 3)</pre> 
+      </li> 
+      <li>Associativity: If the <em>same</em> operator occurs twice, is the left or right one executed first? Does <code>1 - 2 - 3</code> mean 
+        <pre>(1 - 2) - 3
+1 - (2 - 3)</pre> 
+      </li> 
+      <li>In C++, most operators are left-associative. Exception: Assignment 
+        <pre>a = b = 3</pre> 
+      </li> 
+    </ul> 
+    <h1>Scala Operators</h1> 
+    <ul>
+      <li>Function names can be any sequence of <em>opchar</em>s: characters other than whitespace, <code>A-Z0-9()[]{}`'".,;</code></li> 
+      <li>Operator precedence depends on <em>first</em> character 
+        <pre>(all letters)
+|
+^
+&amp;
+&lt; &gt;
+= !
+:
++ -
+* / %
+(all other special characters)</pre> 
+      </li> 
+      <li>Operators ending in <code>:</code> are right associative; all others are left associative 
+        <pre>a :: b :: Nil is a :: (b :: Nil)</pre> 
+      </li> 
+    </ul> 
+    <h1>Lists: Access by Position</h1> 
+    <ul>
+      <li>Not very efficient for linked lists</li> 
+      <li>Index values are 0-based</li> 
+      <li><code>()</code> are used for indexed access—not <code>[]</code> 
+        <pre>List(17, 29)(1) is 29</pre> 
+      </li> 
+      <li><code>slice</code> takes sublist 
+        <pre>List(2, <strong>3, 5,</strong> 7).slice(1, 3) is List(3, 5) </pre> 
+        <p>Arguments to <code>slice(from, to)</code>:</p> 
+        <ul>
+          <li><code>from</code> is the first index to include</li> 
+          <li><code>to</code> is the first index ≥ <code>from</code> to exclude</li> 
+        </ul> 
+      </li> 
+      <li>See lab for <code>drop</code> <code>take</code></li> 
+    </ul> 
+    <h1>Methods with Function Parameters</h1> 
+    <ul>
+      <li>Workhorse functions of the library</li> 
+      <li>You already saw <code>map</code>, <code>filter</code>, <code>reduce</code></li> 
+      <li>Others explored in lab</li> 
+      <li>Instead of looping, build a function and pass it to one of these methods 
+        <pre>def randList(len : Int, n : Int) = 
+  (1 to len).map((x : Int) =&gt; gen.nextInt(n))</pre> 
+      </li> 
+      <li>Some methods return a pair 
+        <pre> List(2,3,5,7).partition(isEven) is (List(2),List(3, 5, 7))</pre> 
+      </li> 
+    </ul> 
+    <h1>Tuples</h1> 
+    <ul>
+      <li>Heterogeneous sequence of elements 
+        <pre>val myFirstTuple = (1, 3.14, "Fred")</pre>
+      </li> 
+      <li>Tuple type <code>(Int, Double, String)</code></li> 
+      <li>Access components with methods <code>_1</code> (!), <code>_2</code>, <code>_3</code> 
+        <pre>val second = myFirstTuple._2</pre>
+      </li> 
+      <li>Or with destructuring 
+        <pre>val (first, second, _) = myFirstTuple</pre>
+      </li> 
+      </ul> 
+     
+
+    <h1>Maps</h1> 
+    <p class='sideimage'><img src='desert-island.jpg' alt='desert-island'/></p> 
+    <ul>
+      <li><em>If I were stranded on a desert island and could only take one data structure with me, it would be the hash table.</em> — Peter van der Linden</li> 
+      <li>Construct a map 
+        <pre>val scores = Map("Alice" -&gt; 10, "Bob" -&gt; 3, "Cindy" -&gt; 8)</pre>
+      </li> 
+      <li><code>-&gt;</code> operator makes pairs. <code>"Alice" -&gt; 10</code> is the same as <code>("Alice", 10)</code></li> 
+      <li>Access element 
+        <pre>val alicesScore = scores("Alice")
+   // <cite>They don't call it a map for nothing</cite>
+val fredsScore = scores.getOrElse("Fred", 0)</pre>
+      </li> 
+      <li>Update map (i.e. get new map with updates) 
+        <pre>val newScores = scores + ("Bob" -&gt; 10, "Fred" -&gt; 7)
+val newerScores = newScores - "Alice" // Remove key and value</pre> 
+      </li> 
+      
+      </ul>
+    <h1><code>flatMap</code></h1> 
+    <li>Given an integer sequence <code>s</code>, it is easy to form all pairs (x, 0): 
+        <pre>val s = (1 to 4).toList
+s.map(x =&gt; (x, 0))
+    // List((1, 0), (2, 0), (3, 0), (4, 0))</pre> 
+    </li> 
+    <li>What if we want to have all pairs (x, y) where x, y are elements of s?</li> 
+    <li>Try it by calling <code>map</code> twice: 
+      <pre>s.map(y =&gt; <strong>s.map(x =&gt; (x, y))</strong>)
+  // List(List((1,1), (2,1), (3,1), (4,1)),
+  //        List((1,2), (2,2), (3,2), (4,2)),
+  //        List((1,3), (2,3), (3,3), (4,3)),
+  //        List((1,4), (2,4), (3,4), (4,4)))</pre>
+    </li> 
+    <li>Close, but not quite. To “flatten out” the result, use <code>flatMap</code> instead: 
+      <pre>s.<strong>flatMap</strong>(y =&gt; s.map(x =&gt; (x, y)))
+  // List((1, 1), (1, 2), (1, 3), (1, 4), (2, 1), (2, 2), ..., (4, 4)) </pre>
+    </li> 
+
+    <h1>Folding</h1> 
+    <ul>
+      <li>The sum of the elements in <code>List(a, b, c)</code> is 
+        <p><code>a + b + c = 0 + a + b + c = ((0 + a) + b) + c</code></p> 
+      </li> 
+      <li>Use <code>foldLeft</code> or the <code>/:</code> operator 
+        <pre>def sum(lst: List[Int]) = (0 /: lst) ((x, y) =&gt; x + y)</pre> 
+      </li> 
+      <li>The <code>/:</code> indicates the tree shape 
+        <pre>  a+b+c
+     / \
+  a+b   c
+   / \
+  a   b
+ / \
+0   a</pre> 
+      </li> 
+      <li>The first argument of the folding function is the partial answer; the second is the new list value to be considered</li> 
+      <li>To recurse may be divine, but not to recurse is even better: 
+        <pre> def fac(n : Int) = (1 /: (1 to n)) {_ * _}</pre> 
+      </li> 
+      <li>The <code>foldRight</code> operator works right-to-left: <code>a + (b + (c + 0))</code></li> 
+    </ul> 
+    <h1><code>mkString</code></h1> 
+    <ul>
+      <li><code>toString</code> produces the familiar <code>List(1, 2, 3)</code></li> 
+      <li>What if we want <code>1 | 2 | 3</code>? 
+        <pre>lst.mkString("|")</pre> 
+        <p>One fewer separator than elements</p> 
+      </li> 
+      <li>What if we want <code>[1 | 2 | 3]</code>? 
+        <pre>lst.mkString("[", "|", "]")</pre> 
+      </li> 
+      <li>Nice attention to detail by the library designers</li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='sideimage'><img src='../../../images/lab.jpg' alt='???'/></p> 
+    <ul>
+      <li>You work with a buddy </li> 
+      <li>One of you writes the code (coder), the other types up answers (scribe)</li> 
+      <li>When you get stuck, ask your buddy first!</li> 
+      <li>Switch roles each lab. The previous scribe is the coder for this lab.</li> 
+      <li>The scribe submits lab work in <code>lab5/report.txt</code> inside the Git repo. Include the coder's name in the report! </li>
+      <li>If the coder wants to submit something, that's cool too. Do whatever is easy.</li>
+    </ul> 
+    <h1>Step 1: Warmup</h1> 
+    <ol>
+      <li>What do <code>take</code> and <code>drop</code> do? Give a brief explanation and an example for each.</li> 
+      <li>What is the difference between <code>take</code> and <code>dropRight</code>?</li> 
+      <li>Look up the definition of <code>span</code> in Scaladoc. Make an example that demonstrates how <code>span</code> works. What is your example, and what value does it produce?</li> 
+      <li>The <code>span</code> method returns a pair. Show how you can get at each of the elements in that pair.</li> 
+    </ol> 
+    <h1>Step 2: Folding</h1> 
+    <ol>
+      <li>Use the <code>/:</code> folding operator to concatenate all strings in a <code>List[String]</code>, separating them with spaces. For example, if you start with <code>val lst = List("Hello", "Scala", "World")</code>, you should produce an expression involving <code>lst</code> and <code>/:</code> that yields <code>"Hello Scala World"</code>. (Hint: It is very easy to get <code>" Hello Scala World"</code>. The challenge is to get rid of the first space. </li> 
+      <li>Folding is useful for much more than computing sums and products. Many algorithms that compute a value by making a loop through an array can be obtained with a suitable function whose first argument is the result from the elements that you have seen so far, and whose second argument is the next list element. 
+        <p>Consider the case of computing the maximum. Find a suitable function whose first argument is the maximum of all elements visited so far, and whose second argument is the next element.</p> 
+        <p>What the code for your function <code>maximum(lst : List[Int]) : Int</code>? (You may assume that the list has length &gt; 0)</p> 
+      </li> 
+      <li>What does this function do? 
+        <pre>def mystery(lst : List[Int]) = 
+  (List[Int]() /: lst) ((x, y) =&gt; if (y % 2 == 0) x else x :+ y)</pre> 
+        <p>Explain how the function works.</p> 
+      </li> 
+    </ol> 
+
+    <h1>Step 3. A Puzzle</h1> 
+    <p>Here is a <a href='http://java.dzone.com/articles/thursday-code-puzzler-playing?mz=112093-http://java.dzone.com/articles/thursday-code-puzzler-playing?mz=112093-'>puzzle</a> from a programmer web site: </p> 
+    <blockquote>
+      <p>Given an array of numbers, return the occurances [sic] of the number 1 in the array. So, if the array contains 1, 2, 11, 13 you would return 4 (as 11 contains two instances of 1). </p> 
+    </blockquote> 
+    <ol class='lower-alpha'>
+      <li>Suppose you are given a list of numbers, such as <code>List(1, 2, 11, 13)</code>. To get digits of one, it would be better to have strings. How do you get an array of strings? Hint: toString, map</li> 
+      <li>Now look at an individual string such as "1811". How can one count the number of ones? Hint: (1) Strings are collections of characters (2) Try the <code>count</code> method that takes a predicate. For example, <code>(1 to 10).count(_ % 3 == 0)</code> yields 3</li> 
+      <li>Ok, now you need to apply that to each of the strings. How do you do that? (Hint: map)</li> 
+      <li>That gives you a collection of counts. How do you total them up? Hint: <code>reduce</code>, or, if you prefer, look at the scaladoc of <code>Seq</code> for a simpler way.)</li> 
+      <li>Now all together. If <code>lst</code> is a list of integers, how do you get the total number of digits of one?</li> 
+    </ol>
+    <h1>Step 4: Misery with Tuples</h1> 
+    <ol>
+      <li>What is <code>1 -&gt; 2 -&gt; 3</code>? What is the type of the result?</li> 
+      <li>Write a function <code>flatten</code> that takes such a thing and turns it into an <code>(Int, Int, Int)</code>. Use <code>_1</code>, <code>_2</code></li> 
+      <li>Repeat with destructuring.</li> 
+      <li>What is the result of the following statement, and why? 
+        <pre>val x,y,z = (1,2,3)</pre>
+      </li> 
+    </ol> 
+
+    <h1>Step 5: If I Had Just One Data Structure... </h1> 
+    <ol>
+        <li>And if I could just take one method, it would be <code>groupBy</code>. Load all words from a dictionary into a list by calling
+          <pre>val words = io.Source.fromURL("http://horstmann.com/sjsu/spring2018/cs152/words").getLines.toList
+</pre>
+          What is <code>words.groupBy(w =&gt; w.length)</code>?</li> 
+      <li>Make a map so that <code>myMap('a')</code> yields all words that start with the letter a and so on.</li> 
+      <li>How many words start with a given letter? Hint: <code>myMap.map(...)</code></li> 
+      <li>Extra credit: Turn this into a list of tuples that is sorted by frequency. Hint: <code>sorted</code> doesn't work because Scala doesn't know how to sort the tuples. There are two other <code>sort</code> methods. One of them wants a function that maps into something that Scala does know how to sort—the easy choice for solving this exercise.</li> 
+      <li>Extra credit: Now do it with the other method (and some tuple misery).</li> 
+    </ol> 
+  </body> 
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture6/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:17 GMT -->
+</html>
+  

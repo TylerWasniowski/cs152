@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/vm.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:33 GMT -->
+<head>
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <title>vm</title> 
+    <link href='../../../styles.css' rel='stylesheet' type='text/css'/> 
+  </head> 
+  <body>
+    <h1>CS152 Virtual Machine</h1>
+    <ol><li>Download VirtualBox from <a href='http://virtualbox.org/'>http://virtualbox.org</a> and install.</li>
+      <li>Download <a href='http://cdimage.ubuntu.com/lubuntu/releases/16.04.3/release/lubuntu-16.04.3-desktop-amd64.iso'>Lubuntu 16.04 64 bit</a>.</li>  
+      <li>Start VirtualBox. New → Name: Lubuntu, Version: Ubuntu (64 bit), then follow the wizard with all defaults.</li> 
+      <li>Select Settings → Storage → Click on the first + at IDE controller (with tooltip Add CD/DVD drive) → Choose disk → Choose the downloaded ISO file → Ok.</li> 
+      <li>Start your new VM.</li> 
+      <li>Install Lubuntu. Accept all defaults. Remember the password that you chose! (I just choose <code>secret</code>—nobody can log into your VM without first logging into your computer.) A couple of screens in the installer are cut off, but just hitting Enter got me past them.</li> 
+      <li>When installation is complete, select Devices → Insert Guest Additions CD image from the VirtualBox menu.</li>     
+      <li>In Lubuntu, open a terminal (Ctrl+Alt+T). Type these commands:
+        <pre>cd /media/*/VB*
+sudo apt install gcc make perl
+sudo ./VB*Linux*</pre>
+      
+    Type <code>secret</code> (or whatever you chose) when asked for your password.</li>
+      <li>Reboot by clicking on the bird icon in the bottom left and selecting Logout, then Reboot.</li>
+      <li>Restart the Lubuntu virtual machine and log in.</li>
+      <li>Open a terminal (Ctrl+Alt+T) and type <code>firefox &amp;</code></li>
+      <li>In the Lubuntu Firefox, visit <code>http://horstmann.com/sjsu/spring2018/cs152/vm.html</code> (this page).</li>
+      <li>Select View → Full Screen. </li>
+      <li>In the terminal, type 
+        <pre>sudo apt install git openjdk-8-jdk emacs
+</pre>
+      Type <code>secret</code> (or whatever) when prompted for a password.
+      </li>
+      <li>In Firefox, visit <a>http://scala-ide.org/download/sdk.html</a> Locate “Linux GTK 64 bit” and download. Select “Save to disk” when prompted.</li><li>When the download has finished, type this into a terminal window:
+        <pre>tar xvf ~/Downloads/scala*.tar.gz
+</pre>
+      </li>
+      <li>Run the Scala IDE: Type 
+        <pre>~/eclipse/eclipse &amp;</pre>
+        in a terminal window.
+      </li>
+      <li>Quit the Scala IDE and shut down the virtual machine (bird icon → Logout → Shutdown.)</li>
+    </ol>
+    <h2>FAQ</h2>
+    <p class='question'>How do I copy and paste text between Windows and the Linux VM?</p>
+    <p class='answer'>There is a way of doing it, but why? Just start Firefox in Linux and read the lab/homework instructions there.</p>
+    <p class='question'>How do I transfer files between Windows and the Linux VM?</p>
+    <p class='answer'>There is a way of doing it, but why? Just do your coding in the Linux VM and save all your work in your Git repo.</p>
+    <p class='question'>How do I switch from the Linux VM full screen mode to Windows?</p>
+    <p class='answer'>There is a way of doing it, but why? Enjoy distraction-free coding in the Linux VM.</p>
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/vm.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:33 GMT -->
+</html>

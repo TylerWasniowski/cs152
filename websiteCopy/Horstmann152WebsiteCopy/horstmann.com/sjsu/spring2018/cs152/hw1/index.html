@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw1/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+<head>
+    <link href='../../../../styles.css' rel='stylesheet' type='text/css'/> 
+    <meta content='text/html; charset=utf-8' http-equiv='content-type'/> 
+    <title>CS152</title> 
+  </head>
+  <body><h2>Homework 1 / Prerequisite Quiz</h2>
+     
+    <ol><li>Prepare a plain text file <code>aboutme.txt</code> with the following information:
+        <pre>Your name:
+Your student ID:
+Your major:
+Your preferred email address: 
+Check one: [ ] Undergraduate, [ ] Graduate, [ ] Open university 
+Repeating the class? [ ] Yes, [ ] No
+Semester, instructor, and grade of your CS151 prerequisite: 
+Time it took you to answer the question below:
+Did you ask anyone for help? [ ] Yes, [ ] No
+If adding: [ ] Section 3, [ ] Section 4, [ ] Either
+</pre>
+      </li>
+      <li>Solve the problem below.</li>
+      <li>Make a <em>private</em> Git repo for all your work in this class. Put your work for this homework into a folder <code>hw1</code>, i.e. the files <code>aboutme.txt</code>, <code>Op.java</code>, <code>Product.java</code>, <code>Read.java</code>, and <code>ExprTest2.java</code>. Make sure these files do not have package declarations. </li>
+      <li>Add me as a contributor to your repo. My BitBucket and GitHub ids are <code>cayhorstmann</code>.</li>
+      <li>Send an email to Cay.Horstmann@sjsu.edu with subject line
+        <pre>CS152 Repo</pre>
+        and the URL to your repo in the body of your message. Also be sure that I can tell who you are from your email. Ever so often, I get an email where the sender is identified as something like GandalfTheUltimate or WildWeasel1989. That's not the professional presentation that we want to see from our graduates. If in doubt, use your SJSU email.
+      </li>
+      <li>Run these commands:
+        <pre>cd /tmp
+git clone <var>your repo</var> studentrepo
+cd studentrepo/hw1
+for f in Expr Const Function Sum Rand ExprTest ; do curl -O http://horstmann.com/sjsu/spring2018/cs152/hw1/$f.java ; done
+javac -cp .:<var>path to JUnit4</var>/\* -Xlint:unchecked *.java
+java -cp .:<var>path to JUnit4</var>/\* org.junit.runner.JUnitCore ExprTest
+</pre>
+        Make sure that you pass all five tests.
+      </li>
+      <li>There is no trust in this world. Add a screenshot to your repo that shows how you executed these commands, and the resulting output, in a file <code>hw1/screenshot.png</code>. (If you use the Lubuntu VM, you can run the <code>scrot</code> command to get a screen shot.)</li>
+    </ol>
+    <p><b>Important:</b> If you are currently enrolled in the class, you must turn in a complete or partial solution to this assignment by the deadline, or you may be dropped from the class. If you are trying to add the class, you will receive an add code after you have turned in the assignment and space becomes available.</p>
+    <hr/>
+    <p>You are given an interface <code><a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/Expr.java'>Expr</a></code> to evaluate expressions, a class <code><a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/Const.java'>Const</a></code> that produces constant expressions, a class <code><a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/Rand.java'>Rand</a></code> that produces random integers, and an interface <code><a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/Function.java'>Function</a></code> that defines a function with parameters and return value of type <code>T</code>. </p>
+    <ul><li>Complete the class <code>Op</code> that evaluates expressions of the form <var>f</var>(<var>e</var><sub>1</sub>, ..., <var>e<sub>n</sub></var>):
+
+        <pre>public class Op&lt;T&gt; . . .
+{
+   . . .
+   @SafeVarargs public Op(Function&lt;T&gt; fun, Expr&lt;T&gt;... args)
+   {
+      . . .
+   }
+   . . .
+}
+</pre> An <code>Op&lt;T&gt;</code> <em>is</em> an <code>Expr&lt;T&gt;</code> (because it can be evaluated) and <em>has</em> <code>Expr&lt;T&gt;</code> (the arguments). Use the Composite design pattern. To evaluate the expression, invoke the function with a list of the arguments.</li>
+    
+    <li>The <code>Op</code> class is intended to be a superclass for operators such as <a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/Sum.java'><code>Sum</code></a> and 
+      <pre>public class Product . . .
+{
+   @SafeVarargs public Product(Expr&lt;Integer&gt;... args)
+   {
+      . . .
+   }
+}
+</pre> Implement <code>Product</code> <em>without</em> using streams. (Don't follow the implementation of <code>Sum</code>.)</li>
+    <li>Complete the class <code>Read</code> that reads a single integer from standard input. You don't have to implement error handling.
+      <pre>import java.util.Scanner;
+
+public class Read implements Expr&lt;Integer&gt;
+{
+   private static Scanner in = new  Scanner(System.in);
+   . . .
+}
+</pre></li>
+    <li>A JUnit 4 test <a href='http://horstmann.com/sjsu/spring2018/cs152/hw1/ExprTest.java'>ExprTest</a> has been provided for your convenience.</li>
+      <li>Provide a JUnit 4 test class <code>ExprTest2</code> with at least three new test cases.</li>
+    </ul>
+  </body>
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/hw1/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:15 GMT -->
+</html>

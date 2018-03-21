@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture16/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:22 GMT -->
+<head>
+    <title>CS152</title> 
+    <meta content='text/html; charset=UTF-8' http-equiv='content-type'/> 
+    <meta name='copyright' content='Copyright  2018 Cay S. Horstmann'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../Slidy2/styles/slidy.css'/> 
+    <link type='text/css' rel='stylesheet' media='screen, projection, print' href='../../../../MySlidy/style.css'/> <!-- custom style rules below --> 
+    <style type='text/css'>div.slide { background-image: url("http://horstmann.com/sjsu/images/sjsu_logo.gif"); background-position: top right; background-repeat: no-repeat; }</style> 
+    <script src='http://horstmann.com/Slidy2/scripts/slidy.js' charset='utf-8' type='text/javascript'></script> 
+    <script src='http://horstmann.com/MySlidy/slidy.js' charset='utf-8' type='text/javascript'></script> 
+  </head> 
+  <body>
+
+    <h1>CS 152 - Lecture 16</h1> 
+    <p class='fullimage'><img src='../../../images/tower-hall.jpg' alt='Cover page image'/></p> 
+    <p><a href='http://horstmann.com/'>Cay S. Horstmann</a></p> 
+
+    <h1>What Are Types?</h1> 
+    <ul>
+      <li>Type = set of values + permitted operations on these values</li> 
+      <li>Example: <code>int</code> in Java. Set of numbers between <code>Integer.MIN_VALUE</code> and <code>Integer.MAX_VALUE</code>. Operations <code>+</code>, <code>-</code>, <code>*</code>, etc.</li> 
+      <li>Used for 
+        <ul>
+          <li>IDE help</li> 
+          <li>Code generation</li> 
+          <li>Error handling</li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Types in Java/Scala</h1> 
+    <ul>
+      <li>8 primitive types: <code>int short long byte char float double boolean</code></li> 
+      <li>Every other type is a <em>reference type</em></li> 
+      <li>Classes</li> 
+      <li>Interfaces</li> 
+      <li>Arrays</li> 
+      <li>These are types of <em>variables</em>. Values cannot have interface type, but they can be <code>null</code>. (Null type)</li> 
+      <li>Additional Types in Scala 
+        <ul>
+          <li>Tuple types <code>(String, Int)</code></li> 
+          <li>Function types <code>(String, String) =&gt; Int</code></li> 
+        </ul> 
+      </li> 
+    </ul> 
+    <h1>Strong Typing</h1> 
+    <ul>
+      <li>Strong typing: Compiler and run-time system guarantee that no type error can occur in a program</li> 
+      <li>Example: Compiler catches <code>"Hello".println()</code>. <code>String</code> has no such method</li> 
+      <li>Not all Java errors are caught at compile-time. 
+        <pre>String[] words = { "Hello", "World" };
+Object[] objs = words; // compiles: Can convert String[] to Object[]
+objs[0] = new Watermelon(); // compiles. Can convert Watermelon to Object
+// Oops: Now words[0] is a Watermelon!</pre> 
+        <p>Causes <code>ArrayStoreException</code> at run-time.</p> 
+      </li> 
+      <li>C/C++ are not strongly typed: 
+        <pre>int luckyNumbers[] = { 17, 29 };
+double* values = (double*) luckyNumbers; // compiles
+double x = values[0]; // may not be a legal floating-point value</pre> 
+      </li> 
+    </ul> 
+    <h1>Static and dynamic typing</h1> 
+    <ul>
+      <li>Static typing: All type errors are caught at compile-time; program will never raise a type error at run-time.</li> 
+      <li>Java is mostly, but not fully statically typed: <code>NullPointerException</code>, <code>ArrayStoreException</code></li> 
+      <li>Some languages are much more dynamic than Java. Ex. JavaScript 
+        <pre>val x = "Hello"
+ ...
+x = new Duck();
+ ...
+x.quack()</pre> 
+        <p>Variables have no types, but values do. Errors caught at run-time ("Duck typing").</p> 
+      </li> 
+      <li>Scala is like Java 
+        <pre>val x = "Hello" // x is inferred to be String</pre> 
+      </li> 
+    </ul> 
+    <h1>Parameterized Types in Scala</h1> 
+    <ul>
+      <li>Simple example: 
+        <pre>class Pair<strong>[T]</strong>(val first: T, val second: T)</pre> 
+      </li> 
+      <li>Scala can infer type from construction parameters: 
+        <pre>val p1 = new Pair(17, 29) // Pair[Int]
+val p2 = new Pair("Hello", "World") // Pair[String]</pre> 
+      </li> 
+      <li>Can also have generic functions 
+        <pre>def firstTwo<strong>[T]</strong>(a : Array[T]) = new Pair(a(0), a(1))</pre> 
+      </li> 
+    </ul> 
+    <h1>Type Bounds</h1> 
+    <ul>
+      <li>In Scala, generic functions are type-checked when they are defined, not when they are instantiated</li> 
+      <li>The following won't compile: 
+        <pre>def min[T](p : Pair[T]) = if (<strong>p.first &lt; p.second</strong>) p.first else p.second</pre> 
+      </li> 
+      <li>No guarantee that 
+        <pre>p.first <strong>&lt;</strong> p.second</pre> 
+        <p>is defined—depends on whether <code>T</code> has <code>&lt;</code> </p> 
+      </li> 
+      <li>Trait <code>Ordered[T]</code> ensures that <code>t &lt; t2</code> operator exists for <code>t</code> ∈ <code>T</code></li> 
+      <li>Use type bound 
+        <pre>def min[<strong>T</strong> <strong>&lt;: Ordered[T]</strong>](p : Pair[T]) = if (p.first &lt; p.second) ...</pre> 
+      </li> 
+      <li>Now we know that <code>p.first &lt; p.second</code> is valid</li> 
+    </ul> 
+    <ul>
+      <li>Technical problem when using Java types: <code>Int</code> is always converted to Scala <code>RichInt</code>, and <code>RichInt &lt;: Ordered[Int]</code>. </li> 
+      <li>Use <code>&lt;%</code> instead of <code>&lt;:</code> if you want to allow conversions 
+        <pre>def min[T <strong>&lt;%</strong> Ordered[T]<strong></strong>](p : Pair[T]) = if (p.first &lt; p.second) ...</pre> 
+      </li> 
+    </ul> 
+    <h1>Variance </h1> 
+    <ul>
+      <li>Suppose <code>Student &lt;: Person</code> (i.e. every student is a person). Should an array of students be a subtype of “array of Person objects”?</li> 
+      <li>In Java, the answer is YES. Virtual machine monitors <em>every array store</em> and throws an exception when an object of the wrong type is stored.</li> 
+      <li>Scala: By default, generic types are <em>invariant</em>. That is, no relationship between <code>G[S]</code> and <code>G[T]</code></li> 
+      <li>Ex. No relationship between <code>Array[Student]</code> and <code>Array[Person]</code></li> 
+      <li>Some Scala types are <em>covariant</em>. For example, immutable lists: 
+        <pre>class List[+T]</pre> 
+        <p>Now <code>List[Student] &lt;: List[Person]</code></p> 
+      </li> 
+      <li>In general, <code>G[+T]</code> means that <code>S</code> &lt;: <code>T</code> ⇒ <code>G[S]</code> &lt;: <code>G[T]</code></li> 
+      <li>Similar, <em>contravariance</em> 
+        <pre>trait Function1 [-T1, +R]</pre> 
+        <p><code>Function1[Person, String] &lt;: Function1[Student, String]</code></p> 
+      </li> 
+    </ul> 
+    <h1>Immutable List Example</h1> 
+    <pre>abstract class GList[<strong>+T</strong>] {
+  def isEmpty : Boolean
+  def head : T 
+  def tail : GList[T]
+}
+
+case class GEmpty[T]() extends GList[T] {
+  override def isEmpty : Boolean = true
+  override def head = error("No head")
+  override def tail = error("No tail")
+}
+
+case class GNonEmpty[T](hd : T, tl : GList[T]) extends List[T] {
+  override def isEmpty : Boolean = false
+  override def head = hd
+  override def tail = tl
+}</pre> 
+    <ul>
+      <li>Note that the list has no mutator—no issue with storing a bad value</li> 
+      <li>If you add a bad value, you just get a list of a weaker type 
+        <pre>scala&gt; val foo = GNonEmpty("foo", GEmpty[String]())
+foo: GNonEmpty[String] = GNonEmpty(foo,GEmpty())
+
+scala&gt; val bar = GNonEmpty(1, foo)
+bar: GNonEmpty[Any] = GNonEmpty(1,GNonEmpty(foo,GEmpty()))</pre> 
+      </li> 
+    </ul> 
+    <h1>Positional Safety Checks</h1> 
+    <ul>
+      <li>Problem with covariance: stores</li> 
+      <li>But stores are not the only problem 
+        <pre>class BadStack extends Stack[Double] { 
+   override def push(e : Double) = { super.push(sqrt(e)) } 
+} </pre> 
+      </li> 
+      <li>Of course <code>BadStack &lt;: Stack[Double]</code></li> 
+      <li>Is <code>Stack[Double] &lt;: Stack[AnyRef]</code>? It better not be: 
+        <pre>Stack[AnyRef] bad = new BadStack(); 
+bad.push("Yikes!"); // calls sqrt("Yikes!")</pre> 
+      </li> 
+      <li>Scala: Cannot use covariant T in “contravariant positions” 
+        <p>Ex. Can't have parameters of covariant T</p> 
+        <pre>class Stack[+T] {
+   def pop() : T = ... // OK
+   def push(newValue : T) { ... } // ERROR--T is parameter type
+   def isEmpty = ...
+}</pre> 
+      </li> 
+    </ul> 
+    <h1>Lower Bounds</h1> 
+    <ul>
+      <li>Can fix <code>push</code> variance problem by making <code>push</code> into a generic method</li> 
+      <li>
+        <pre>class Stack[+T] {
+  def push[N :&gt; T](newValue : N) : Stack[N] = new NonEmptyStack[N](newValue, this)
+  ...
+}</pre> 
+      </li> 
+      <li>T no longer appears as a parameter type of <code>push</code> (parameter is <code>N</code>) </li> 
+      <li>Lower bound is a covariant position</li> 
+      <li>Reasonable behavior: Push a supertype object, and you get a more general stack</li> 
+      <li>Now you can't override <code>push</code> in <code>BadStack</code></li> 
+    </ul> 
+    <h1>Lab</h1> 
+    <p class='halfimage'><img src='../../../sjsu/images/lab.html' alt='???'/></p> 
+    <h1>Step 1: Invariance</h1> 
+    <p>We'll start with these classes. Add them to a Scala file. </p> 
+    <pre>class Person(val name : String) {
+  override def toString = getClass.getName + "[name=" + name + "]" 
+}
+
+class Student(name : String, val id : Int) extends Person(name) {
+  override def toString = super.toString + "[id=" + id + "]" 
+}
+
+object Main {
+  def main(args: Array[String]) {
+    val harry = new Person("Harry Smith")
+    val sally = new Person("Sally Jones")
+    val diana = new Student("Diana Lee", 1729)
+    val frank = new Student("Frank Miller", 2525)
+  }
+}</pre> 
+    <ol>
+      <li>Add a line of code to demonstrate that <code>Student &lt;: Person</code>, that is, a <code>Student</code> object can be converted to the <code>Person</code> type.</li> 
+      <li>Add a line of code to demonstrate that an <code>Array[Student]</code> can <em>not</em> be converted to <code>Array[Person]</code>.</li> 
+      <li>What happens if you try <code>List</code> instead of <code>Array</code>? Why?</li> 
+      <li>What happens when you add a <code>Person</code> to a <code>List[Student]</code>? Does it work? If so, what is the type of the result?</li> 
+    </ol> 
+    <h1>Step 2: Co- and Contravariance</h1> 
+    <ol>
+      <li>Add the generic class 
+        <pre>class MyPair<strong>[T]</strong>(val first: T, val second: T)</pre> 
+        <p>Is <code>MyPair(Student)</code> a subtype of <code>MyPair(Person)</code>? How did you determine the answer? (Note: There is already a <code>Pair[S, T]</code> in Scala.)</p> 
+      </li> 
+      <li>What change do you have to make to the <code>MyPair</code> class to fix the issue of the preceding question? (Hint: It's a very small change.)</li> 
+      <li>Add the following method to the <code>MyPair</code> class: 
+        <pre>def sum(f : Function1[T, Int]) = f(first) + f(second)</pre> 
+        <p>Make objects (with explicit types for extra clarity)</p> 
+        <pre>val f : Function1[Student, Int] = { x : Student =&gt; x.id }
+val g : Function1[Person, Int] = { x : Person =&gt; x.name.length }
+val p : MyPair[Student] = new MyPair(diana, frank) </pre> 
+        <p>Can you call <code>p.sum(f)</code>? <code>p.sum(g)</code>? If so, what are the results?</p> 
+      </li> 
+      <li>It's not surprising that <code>p.sum(f)</code> works. <code>p</code> is a <code>MyPair[<strong>Student</strong>]</code> and <code>f</code> is a <code>Function1[<strong>Student</strong>, Int]</code>. But why does <code>p.sum(g)</code> work, even though the types don't match? </li> 
+    </ol> 
+    <h1>Step 3: Type Bounds</h1> 
+    <ol>
+      <li>Add the following method to the <code>MyPair</code> class: 
+        <pre>def max = if (first &lt; second) second else first</pre> 
+        <p>Why won't the code compile?</p> 
+      </li> 
+      <li>How do you fix the <code>MyPair</code> class so that the <code>max</code> function compiles?</li> 
+      <li>Make some sample code to compute <code>new MyPair(17, 29).max</code>. Did it compile? If not, what fix did you need to make?</li> 
+      <li>Now try forming a <code>MyPair</code> of two <code>Person</code> objects. What happens?</li> 
+      <li>How can you fix this? </li> 
+    </ol> 
+  </body> 
+
+<!-- Mirrored from horstmann.com/sjsu/spring2018/cs152/lecture16/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 21 Mar 2018 03:34:22 GMT -->
+</html>
