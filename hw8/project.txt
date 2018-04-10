@@ -1,0 +1,3 @@
+Project preferences: UDash -> Pheonix -> Continue -> SAFE -> Luminus -> Seaside -> Flutter -> Cascalog -> Emacs Lisp
+
+Team: Jonathan Weinstein, Vincent Brubaker-Gianakos, Stephen Reyes
