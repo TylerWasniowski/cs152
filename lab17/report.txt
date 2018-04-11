@@ -1,0 +1,33 @@
+Step 1:
+    1.
+        Children of charles1: charles2, catherine, james2.
+        Query: parent(charles1, Y).
+
+        Parents of george1: sophia
+        Query: parent(Y, george1).
+
+    2.
+        Rule: grandparent(GP, GC) :- parent(GP, P), parent(P, GC).
+
+        Grandparents of sophia
+        Query: grandparent(X, sophia).
+        Result: james1
+
+        Grandchildren of james1
+        Query: grandparent(james1)
+        Result: charles2, catherine, james2, sophia
+
+    3. 
+        Rule: sibling(A, B) :- parent(P, A), parent(P, B).
+
+        We used:
+            sibling(catherine, james2). (expected: true)
+            sibling(james1, james2). (expected false)
+
+Step 2:
+    1.
+        Query: ancestor(X, sophia).
+        Result: elizabeth, james1
+
+    2.
+        Trace will walk through the code.
