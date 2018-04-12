@@ -31,3 +31,10 @@ Step 2:
 
     2.
         Trace will walk through the code.
+
+    3.
+        Infinite recursion, parent(X, Z) is dead code.
+
+    4.
+
+    5.
