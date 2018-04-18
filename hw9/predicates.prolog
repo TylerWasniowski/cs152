@@ -4,7 +4,7 @@ last(E, [_|T]) :- last(E, T).
 notlast(S, L) :- last(E, L), append(S, [E], L).
 
 subseq(S, L) :- append(S, _, L).
-subseq(S, [_|T]) :- subseq(S, T), S\= [].
+subseq(S, [_|T]) :- subseq(S, T), S \= [].
 
 sublist(X, X).
 sublist(S, [_|T]) :- sublist(S, T).

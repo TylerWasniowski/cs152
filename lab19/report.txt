@@ -1,0 +1,15 @@
+Step 1:
+    1:
+        X = X17, cons(john, cons(mary, nil)) = cons(X17, T)
+        X = X17, john = X17, cons(mary, nil) = T (FAIL)
+
+        X17 = X, cons(X17, T) = cons(john, cons(mary, nil))
+        X17 = X, X17 = john, T = cons(mary,nil)
+    2:
+        member(X, cons(john, cons(mary, nil)))
+            X = X, cons(X, T) = cons(john, cons(mary, nil))
+            X = X, X = john, T = cons(mary, nil)
+    3:
+        X = X, cons(X, T) = T (FAIL)
+
+        X = X, T = cons(X, T)
