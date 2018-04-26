@@ -2,6 +2,9 @@ public class Test
 {
    public static void main(String[] args)
    {
-      int r = 3 + 4 * 5;
+        int a = 3;
+        int b = 4;
+        int c = 5;
+        int r = a + b * c;
    }
 }
