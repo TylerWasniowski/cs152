@@ -1,5 +1,6 @@
 % applyCycle(Cycle, A, B)
 % The given cycle sends A to B
+applyCycle([A], A, A).
 applyCycle(Cycle, A, A) :- delete(Cycle, A, Cycle).
 applyCycle(Cycle, A, B) :- append(_, [A | [B | _]], Cycle).
 applyCycle(Cycle, A, B) :- append([B | _], [A], Cycle).
@@ -26,11 +27,12 @@ orbitHelper(Perm, A, Acc, Orbit) :-
 % cycles(Cycles, Normalized)
 % Given a sequence of cycles, computes their effect
 % as a normalized sequence of cycles.
-cycles(Cycles, N_Sorted) :-
+cycles(Cycles, N_Filtered) :-
     flatten(Cycles, Flattened),
     sort(Flattened, Sorted),
     cyclesHelper(Cycles, Sorted, Normalized),
-    sort(Normalized, N_Sorted).
+    sort(Normalized, N_Sorted),
+    exclude([X] >> (X = [_]), N_Sorted, N_Filtered).
 
 cyclesHelper(_, [], []).
 cyclesHelper(Cycles, [Elements_H | Elements_T], [Sorted | Normalized_T]) :-
@@ -50,6 +52,8 @@ rotation(r7, [3, 5, 6], [b, u, r]).
 
 name(R, N) :- rotation(N, R, _).
 name(R, N) :- rotation(N, _, R).
+
+face(R, F) :- rotation(_, R, F).
 
 % addFront1(E, Ts, Result): Puts E in front of all elements of Ts
 addFront1(_, [], []).
