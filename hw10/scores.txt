@@ -1,0 +1,33 @@
+RUBRIC
+Part A Four test cases (2 points each, max. 8):
+Part B Four test cases (2 points each, max. 8):
+Part B Working query in cube.txt (max. 3 points):
+Part B Four rotation lists in cube.txt (max. 2 points):  
+
+
+ Your Test Run Result:
+S = [[4, 5], [2, 3, 5], [1, 3, 4], [1, 2]].
+
+
+
+S = [[1, 2, 7, 8]].
+
+
+
+S = [[2, 4]].
+
+
+
+S = [[1, 2, 3, 4, 5, 6, 7, 8|...], [2, 4, 6, 8]].
+
+
+
+
+Part B
+
+
+
+
+
+
+Total Points : 10
