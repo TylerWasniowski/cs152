@@ -125,7 +125,7 @@ object SL1 extends App {
   val parser = new SL1Parser
   val parseResult = parser.parseAll(parser.block, new InputStreamReader(System.in))
   parseResult match {
-    case parser.Success(result, next) => println(evalBlock(result, List()))
+    case parser.Success(result, next) => println(result)
     case _ => println(parseResult)
   }
 }

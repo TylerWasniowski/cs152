@@ -1,0 +1,4 @@
+val a = 3;
+val aapply = { f => f(a) };
+def apow = { x => if (x) a * apow(x - 1) else 1 };
+aapply(apow)

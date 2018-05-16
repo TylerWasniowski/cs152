@@ -1,6 +1,11 @@
 a. What objects does the parser yield for aapply and apow?
+aapply:
+	Valdef(aapply,Function(List(f),Block(List(),Funcall(Variable(f),List(Variable(a))))))
+	A Valdef containing a block that contains a simple function call, f(a)
 
-
+apow:
+	Defdef(apow,Function(List(x),Block(List(),IfExpr(Variable(x),Block(List(),Operator(Variable(a),Funcall(Variable(apow),List(Operator(Variable(x),Number(1),SL1Parser$$Lambda$4476/1143571524@52f460b4))),SL1Parser$$Lambda$4477/2118472156@75a30a16)),Block(List(),Number(1)))))))
+	A Defdef containing 
 
 b. What objects are produced when these objects from the parse tree are evaluated? Describe their contents exactly.
 
@@ -13,3 +18,8 @@ c. Where did the mutation happen?
 d. Why was it necessary?
 
 
+
+
+
+Full parse:
+Block(List(Valdef(a,Number(3)), Valdef(aapply,Function(List(f),Block(List(),Funcall(Variable(f),List(Variable(a)))))), Defdef(apow,Function(List(x),Block(List(),IfExpr(Variable(x),Block(List(),Operator(Variable(a),Funcall(Variable(apow),List(Operator(Variable(x),Number(1),SL1Parser$$Lambda$4476/1143571524@52f460b4))),SL1Parser$$Lambda$4477/2118472156@75a30a16)),Block(List(),Number(1))))))),Funcall(Variable(aapply),List(Variable(apow))))
