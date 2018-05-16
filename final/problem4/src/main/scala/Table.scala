@@ -1,6 +1,6 @@
 class Table[-K,+V](entries: List[(K,V)] = List()) { // TODO: Type variance
   def get[A <: K](k: A): Option[V] =
-    entries.find(x => x == k) match {
+    entries.find(x => x._1 == k) match {
       case Some(x) => Some(x._2)
       case None => None
     }
