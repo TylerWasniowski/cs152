@@ -76,35 +76,37 @@ object SL1 extends App {
       case None => None 
     } 
   
-  def eval(expr : Expr, symbols : List[(String, Any)]) : Any = 
-  expr match {
-    case Number(num) => num
-    case Variable(name) => lookup(name, symbols)     
-    case Operator(left, right, f) => {
-      eval(left, symbols) match {
-        case arg1 : Int => 
-          eval(right, symbols) match {
-            case arg2 : Int => 
-              f(arg1, arg2)
-          }
+  def eval(expr : Expr, symbols : List[(String, Any)]) : Any = {
+    println(symbols)
+    expr match {
+      case Number(num) => num
+      case Variable(name) => lookup(name, symbols)
+      case Operator(left, right, f) => {
+        eval(left, symbols) match {
+          case arg1: Int =>
+            eval(right, symbols) match {
+              case arg2: Int =>
+                f(arg1, arg2)
+            }
         }
-      }      
-    
-    case IfExpr(cond, block1, block2) => {
-      eval(cond, symbols) match {
-        case result : Int =>
-          if (result > 0) evalBlock(block1, symbols) else evalBlock(block2, symbols)
       }
+
+      case IfExpr(cond, block1, block2) => {
+        eval(cond, symbols) match {
+          case result: Int =>
+            if (result > 0) evalBlock(block1, symbols) else evalBlock(block2, symbols)
+        }
+      }
+
+      case Funcall(fun, args) => eval(fun, symbols) match {
+        case Closure(params, body, syms) =>
+          evalBlock(body, params.zip(args.map(eval(_, symbols))) ++ syms)
+      }
+
+      case Function(params, body) => Closure(params, body, symbols)
+
+      case _ => expr
     }
-    
-    case Funcall(fun, args) => eval(fun, symbols) match {
-      case Closure(params, body, syms) =>
-        evalBlock(body, params.zip(args.map(eval(_, symbols))) ++ syms) 
-      }    
-    
-    case Function(params, body) => Closure(params, body, symbols)
-    
-    case _ => expr
   }
 
   def evalDef(symbols : List[(String, Any)], defn : Definition) =
@@ -125,7 +127,7 @@ object SL1 extends App {
   val parser = new SL1Parser
   val parseResult = parser.parseAll(parser.block, new InputStreamReader(System.in))
   parseResult match {
-    case parser.Success(result, next) => println(result)
+    case parser.Success(result, next) => println(evalBlock(result, List()))
     case _ => println(parseResult)
   }
 }

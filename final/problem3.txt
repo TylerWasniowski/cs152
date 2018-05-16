@@ -1,3 +1,5 @@
+Basic idea: when creating apow, we don't know what apow is. So we assume apow will exist. After we finish making the body of apow, we can mutate the closure to be the contents of the body.
+
 a. What objects does the parser yield for aapply and apow?
 aapply:
 	Valdef(aapply,Function(List(f),Block(List(),Funcall(Variable(f),List(Variable(a))))))
@@ -5,21 +7,26 @@ aapply:
 
 apow:
 	Defdef(apow,Function(List(x),Block(List(),IfExpr(Variable(x),Block(List(),Operator(Variable(a),Funcall(Variable(apow),List(Operator(Variable(x),Number(1),SL1Parser$$Lambda$4476/1143571524@52f460b4))),SL1Parser$$Lambda$4477/2118472156@75a30a16)),Block(List(),Number(1)))))))
-	A Defdef containing 
+	A Defdef containing a block that contains a IfExpr that contains a Operator that contains a recursive function call to apow.
+
 
 b. What objects are produced when these objects from the parse tree are evaluated? Describe their contents exactly.
-
+	The closures that go into the symbol table.
+	Here are the closures exactly:
+		aapply:
+			(aapply,Closure(List(f),Block(List(),Funcall(Variable(f),List(Variable(a))))))
+		apow:
+			(apow,Closure(List(x),Block(List(),IfExpr(Variable(x),Block(List(),Operator(Variable(a),Funcall(Variable(apow),List(Operator(Variable(x),Number(1),SL1Parser$$Lambda$4464/1931427029@60615488))),SL1Parser$$Lambda$4465/1988172421@b25cfaf)),Block(List(),Number(1))))))
 
 
 c. Where did the mutation happen?
-
+	In the symbol table for the closure.
 
 
 d. Why was it necessary?
+	This is how implementing apow in this way would go if we didn't mutate:
+		To make the body of apow (which has a recursive call), apow must point to the the body of apow. This is circular logic with no base case, so apow could not exist.
+
+		With the mutation, we can just assume the body will exist. Make the body, and then point apow to the body in apow's symbol table.
 
 
-
-
-
-Full parse:
-Block(List(Valdef(a,Number(3)), Valdef(aapply,Function(List(f),Block(List(),Funcall(Variable(f),List(Variable(a)))))), Defdef(apow,Function(List(x),Block(List(),IfExpr(Variable(x),Block(List(),Operator(Variable(a),Funcall(Variable(apow),List(Operator(Variable(x),Number(1),SL1Parser$$Lambda$4476/1143571524@52f460b4))),SL1Parser$$Lambda$4477/2118472156@75a30a16)),Block(List(),Number(1))))))),Funcall(Variable(aapply),List(Variable(apow))))
