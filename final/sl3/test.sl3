@@ -1,0 +1,6 @@
+main() {
+  var a = 4;
+  var b = 3;
+  print(a + b);
+  return 0;
+}

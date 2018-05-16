@@ -14,6 +14,8 @@ case class Operator(left : Expr, right : Expr,
                     op : String) extends Expr
 case class Funcall(fun : String, args : List[Expr]) extends Expr
 
+case class Input(prompt: String) extends Expr
+
 case class Fundef(name : String, params : List[String], defs : List[String], stats : List[Statement], result : Expr)
 
 case class Block(stats : List[Statement])
@@ -30,7 +32,7 @@ case class Program(funs : List[Fundef])
 class SL3Parser extends JavaTokenParsers {
   def program: Parser[Program] = rep(fundef) ^^ { Program(_) }
   
-  def stat: Parser[Statement] = assign | ifstat | whilestat | expr <~ ";" 
+  def stat: Parser[Statement] = assign | ifstat | whilestat | expr <~ ";"
 
   def block: Parser[Block] = stat ^^ (x => Block(List(x))) | 
     "{" ~> rep(stat) <~ "}" ^^ { Block(_) }
@@ -62,13 +64,17 @@ class SL3Parser extends JavaTokenParsers {
   }
   
   def factor: Parser[Expr] = wholeNumber ^^ { x : String => Number(x.toInt) } |
-    varOrFuncall | "(" ~> expr <~ ")"
-  
+    varOrFuncall | prompt | "(" ~> expr <~ ")"
+
   def varOrFuncall: Parser[Expr] = ident ~ opt( "(" ~> repsep(expr, ",") <~ ")" ) ^^ { 
     case name ~ Some(args) => Funcall(name, args)
     case name ~ None => Variable(name) 
   }   
-  
+
+  def prompt: Parser[Expr] = ("?" ~> stringLiteral) ^^ {
+    x => Input(x)
+  }
+
   def cond: Parser[BoolOp] = expr ~ ("==" | "!=" | "<=" | "<" | ">=" | ">") ~ expr ^^ { 
     case x ~ op ~ y => BoolOp(x, y, op)}
 }	
